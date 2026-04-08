@@ -263,9 +263,49 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15p
 .confirm-msg{font-size:13px;color:var(--ink2);margin-bottom:20px;line-height:1.5;}
 .confirm-btns{display:flex;gap:8px;justify-content:center;}
 
-/* MOBILE */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:180;}
+/* ── CALENDAR ── */
+.cal-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+.cal-nav{display:flex;align-items:center;gap:10px;}
+.cal-month{font-size:18px;font-weight:700;letter-spacing:-.02em;}
+.cal-view-btns{display:flex;gap:4px;}
+.cal-view-btn{padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--ink2);transition:all .15s;}
+.cal-view-btn.active{background:var(--or);border-color:var(--or);color:#fff;}
+.role-filters{display:flex;gap:6px;flex-wrap:wrap;}
+.role-pill{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:2px solid transparent;transition:all .15s;opacity:.45;}
+.role-pill.on{opacity:1;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.cal-dow{background:var(--surface2);padding:8px 0;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);}
+.cal-cell{background:var(--surface);min-height:100px;padding:6px;position:relative;transition:background .15s;}
+.cal-cell:hover{background:var(--surface2);}
+.cal-cell.other-month{background:var(--bg);opacity:.5;}
+.cal-cell.today .cal-day-num{background:var(--or);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.cal-day-num{font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:4px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.cal-event{border-radius:4px;padding:2px 5px;font-size:10px;font-weight:600;margin-bottom:2px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .15s;}
+.cal-event:hover{opacity:.8;}
+.cal-more{font-size:10px;color:var(--ink3);cursor:pointer;padding:1px 4px;}
+.cal-week-grid{display:grid;grid-template-columns:52px repeat(7,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.cal-time-col{background:var(--surface2);}
+.cal-time-slot{height:48px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:10px;color:var(--ink3);border-bottom:1px solid var(--border);}
+.cal-week-col{background:var(--surface);position:relative;}
+.cal-week-dow{background:var(--surface2);padding:8px 4px;text-align:center;font-size:11px;font-weight:700;color:var(--ink2);border-bottom:1px solid var(--border);}
+.cal-week-slot{height:48px;border-bottom:1px solid var(--border);position:relative;cursor:pointer;}
+.cal-week-slot:hover{background:var(--surface2);}
+.cal-week-event{position:absolute;left:2px;right:2px;border-radius:4px;padding:2px 4px;font-size:10px;font-weight:600;cursor:pointer;overflow:hidden;z-index:2;}
+
+/* Task modal */
+.task-modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,26,23,.5);z-index:600;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;}
+.task-modal-overlay.show{display:flex;}
+.task-modal{background:var(--surface);border-radius:16px;width:100%;max-width:520px;box-shadow:0 20px 60px rgba(28,26,23,.18);animation:fadeUp .2s ease;}
 .overlay.show{display:block;}
+/* ── CONTRATOS ── */
+.csec{display:none;}
+.csec.active{display:block;}
+.ctoggle{padding:7px 14px;border-radius:8px;border:1.5px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;background:var(--surface);color:var(--ink2);transition:all .15s;font-family:var(--font);}
+.ctoggle.active{background:var(--or);border-color:var(--or);color:#fff;}
+.c-cond{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--border);margin-bottom:7px;cursor:pointer;transition:background .15s;}
+.c-cond:hover{background:var(--surface2);}
+.c-cond.checked{background:var(--grl);border-color:var(--gr);}
+
 @media(max-width:900px){
   .nav{transform:translateX(-100%);}
   .nav.open{transform:translateX(0);}
@@ -358,6 +398,40 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15p
   </div>
 </div>
 
+<!-- START CONTEXT MODAL -->
+<div class="confirm-box" id="startModal">
+  <div class="confirm-inner" style="max-width:420px;text-align:left;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <div style="font-size:28px" id="start-emoji">🔑</div>
+      <div>
+        <div class="confirm-title" style="text-align:left;margin-bottom:0" id="start-proc-name">Proceso</div>
+        <div style="font-size:12px;color:var(--ink2)" id="start-proc-resp">—</div>
+      </div>
+    </div>
+    <div style="height:1px;background:var(--border);margin:14px 0"></div>
+    <div style="font-size:13px;font-weight:600;color:var(--ink2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em;font-size:11px;">Contexto de esta ejecución</div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label class="form-label">Inmueble / Piso</label>
+      <input class="form-input" id="ctx-piso" placeholder="Ej: C/Colón 12, 3º · Apto. Ruzafa 8" autocomplete="off" onkeydown="if(event.key==='Enter')document.getElementById('ctx-persona').focus()">
+    </div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label class="form-label">Inquilino / Propietario</label>
+      <input class="form-input" id="ctx-persona" placeholder="Ej: Ana García · Propietario Martínez" autocomplete="off" onkeydown="if(event.key==='Enter')document.getElementById('ctx-notas').focus()">
+    </div>
+    <div class="form-group" style="margin-bottom:4px;">
+      <label class="form-label">Notas adicionales (opcional)</label>
+      <input class="form-input" id="ctx-notas" placeholder="Ej: Llega tarde, late check-in 22h" onkeydown="if(event.key==='Enter')confirmStartProc()">
+    </div>
+    <div style="background:var(--surface2);border-radius:8px;padding:10px 12px;margin-top:12px;font-size:12px;color:var(--ink2);">
+      💡 Esta información aparecerá en el dashboard y en el registro para identificar la ejecución.
+    </div>
+    <div class="confirm-btns" style="margin-top:16px;">
+      <button class="btn btn-ghost" onclick="closeStartModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmStartProc()">Iniciar proceso →</button>
+    </div>
+  </div>
+</div>
+
 <nav class="nav" id="nav">
   <div class="nav-logo">
     <div class="nlb">ER</div>
@@ -367,7 +441,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15p
   <div class="ni active" onclick="goTo('dashboard',this)"><span class="ico">◼</span>Dashboard</div>
   <div class="ni" onclick="goTo('processes',this)"><span class="ico">☰</span>Procesos SOP<span class="nbadge" id="nb-p">11</span></div>
   <div class="nav-sec">Operaciones</div>
+  <div class="ni" onclick="goTo('calendar',this)"><span class="ico">🗓</span>Calendario</div>
   <div class="ni" onclick="goTo('registry',this)"><span class="ico">◎</span>Registro</div>
+  <div class="ni" onclick="goTo('contratos',this)"><span class="ico">📄</span>Contratos</div>
   <div class="ni" onclick="goTo('assistant',this)"><span class="ico">✦</span>Asistente IA</div>
   <div class="nav-footer">
     <div class="user-row">
@@ -384,6 +460,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15p
       <div class="topbar-title" id="topbar-title">Dashboard</div>
     </div>
     <div class="topbar-right">
+      <button class="btn btn-ghost btn-sm" onclick="goTo('calendar',document.querySelector('[onclick*=calendar]'))">🗓 Calendario</button>
       <button class="btn btn-ghost btn-sm" onclick="openNewProcModal()">+ Nuevo SOP</button>
       <button class="btn btn-primary btn-sm" onclick="goTo('assistant',document.querySelector('[onclick*=assistant]'))">✦ Asistente IA</button>
     </div>
@@ -530,6 +607,380 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15p
 
   </div>
 </div>
+
+    <!-- CALENDAR VIEW -->
+    <div class="view" id="view-calendar">
+      <div class="cal-toolbar">
+        <div class="cal-nav">
+          <button class="btn btn-ghost btn-sm" onclick="calPrev()">←</button>
+          <div class="cal-month" id="cal-month-label">—</div>
+          <button class="btn btn-ghost btn-sm" onclick="calNext()">→</button>
+          <button class="btn btn-ghost btn-sm" onclick="calToday()" style="font-size:11px">Hoy</button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div class="role-filters" id="role-filters"></div>
+          <div class="cal-view-btns">
+            <button class="cal-view-btn active" id="btn-month" onclick="setCalView('month',this)">Mes</button>
+            <button class="cal-view-btn" id="btn-week" onclick="setCalView('week',this)">Semana</button>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openTaskModal(null,null)">+ Nueva tarea</button>
+        </div>
+      </div>
+      <div id="cal-container"></div>
+    </div>
+
+<!-- CONTRATOS VIEW -->
+<div class="view" id="view-contratos">
+  <div style="max-width:820px;margin:0 auto">
+
+    <!-- PROGRESS -->
+    <div style="display:flex;gap:0;margin-bottom:24px;border-radius:10px;overflow:hidden;border:1px solid var(--border)">
+      <div class="con-tab active" id="ctab-0" onclick="cGoStep(0)" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:600;background:var(--or);color:#fff;cursor:pointer">1 Tipo</div>
+      <div class="con-tab" id="ctab-1" onclick="cGoStep(1)" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:600;background:var(--surface);color:var(--ink3);cursor:pointer;border-left:1px solid var(--border)">2 Partes</div>
+      <div class="con-tab" id="ctab-2" onclick="cGoStep(2)" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:600;background:var(--surface);color:var(--ink3);cursor:pointer;border-left:1px solid var(--border)">3 Inmueble</div>
+      <div class="con-tab" id="ctab-3" onclick="cGoStep(3)" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:600;background:var(--surface);color:var(--ink3);cursor:pointer;border-left:1px solid var(--border)">4 Económico</div>
+      <div class="con-tab" id="ctab-4" onclick="cGoStep(4)" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:600;background:var(--surface);color:var(--ink3);cursor:pointer;border-left:1px solid var(--border)">5 Especiales</div>
+      <div class="con-tab" id="ctab-5" onclick="cGoStep(5)" style="flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:600;background:var(--surface);color:var(--ink3);cursor:pointer;border-left:1px solid var(--border)">6 Generar</div>
+    </div>
+
+    <!-- STEP 0: TIPO -->
+    <div class="csec active" id="csec-0">
+      <div style="font-size:18px;font-weight:800;margin-bottom:4px">Tipo de contrato</div>
+      <div style="font-size:13px;color:var(--ink2);margin-bottom:20px">Selecciona el tipo de arrendamiento para adaptar la plantilla.</div>
+      <div class="card" style="padding:18px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px">📋 Tipo de arrendamiento</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="ctoggle active" onclick="cSelectTipo(this,'habitacion')">🛏 Habitación</button>
+          <button class="ctoggle" onclick="cSelectTipo(this,'media')">🏠 Media estancia</button>
+          <button class="ctoggle" onclick="cSelectTipo(this,'larga')">🏡 Larga estancia</button>
+          <button class="ctoggle" onclick="cSelectTipo(this,'gestion')">🤝 Gestión propietario</button>
+        </div>
+      </div>
+      <div class="card" style="padding:18px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px">📅 Fechas</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="form-group"><label class="form-label">Fecha inicio <span style="color:var(--or)">*</span></label><input type="date" class="form-input" id="c_fecha_inicio"></div>
+          <div class="form-group"><label class="form-label">Fecha fin <span style="color:var(--or)">*</span></label><input type="date" class="form-input" id="c_fecha_fin"></div>
+          <div class="form-group" style="grid-column:1/-1"><label class="form-label">Justificación de la temporalidad <span style="color:var(--or)">*</span></label>
+          <input class="form-input" id="c_justificacion" placeholder="Ej: Necesidades de trabajo temporal en Valencia, estudios universitarios...">
+          <span style="font-size:11px;color:var(--ink3)">Obligatorio para contratos de temporada</span></div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:20px"><button class="btn btn-primary" onclick="cGoStep(1)">Siguiente →</button></div>
+    </div>
+
+    <!-- STEP 1: PARTES -->
+    <div class="csec" id="csec-1">
+      <div style="font-size:18px;font-weight:800;margin-bottom:4px">Datos de las partes</div>
+      <div style="font-size:13px;color:var(--ink2);margin-bottom:20px">Inquilino/s, propietario y avalista.</div>
+      <div class="card" style="padding:18px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px">👤 Inquilino principal</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group"><label class="form-label">Nombre completo *</label><input class="form-input" id="c_inq1_nombre" placeholder="Nombre y apellidos"></div>
+          <div class="form-group"><label class="form-label">DNI / NIE / Pasaporte *</label><input class="form-input" id="c_inq1_dni" placeholder="12345678A"></div>
+          <div class="form-group"><label class="form-label">Nacionalidad</label><input class="form-input" id="c_inq1_nac" placeholder="Española"></div>
+          <div class="form-group"><label class="form-label">Teléfono</label><input class="form-input" id="c_inq1_tel" placeholder="+34 600 000 000"></div>
+          <div class="form-group" style="grid-column:1/-1"><label class="form-label">Email</label><input class="form-input" id="c_inq1_email" placeholder="inquilino@email.com"></div>
+        </div>
+      </div>
+      <div class="card" style="padding:18px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px">👥 Segundo inquilino</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <button class="ctoggle active" id="cbtn-inq2-no" onclick="cToggle('inq2',false)">No hay</button>
+          <button class="ctoggle" id="cbtn-inq2-si" onclick="cToggle('inq2',true)">Añadir segundo inquilino</button>
+        </div>
+        <div id="c_inq2_block" style="display:none;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group"><label class="form-label">Nombre completo</label><input class="form-input" id="c_inq2_nombre" placeholder="Nombre y apellidos"></div>
+          <div class="form-group"><label class="form-label">DNI / NIE / Pasaporte</label><input class="form-input" id="c_inq2_dni" placeholder="12345678B"></div>
+          <div class="form-group"><label class="form-label">Teléfono</label><input class="form-input" id="c_inq2_tel" placeholder="+34 600 000 000"></div>
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="c_inq2_email" placeholder="email@email.com"></div>
+        </div>
+      </div>
+      <div class="card" style="padding:18px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px">🏘 Propietario</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group"><label class="form-label">Nombre completo *</label><input class="form-input" id="c_prop_nombre" placeholder="Nombre y apellidos o razón social"></div>
+          <div class="form-group"><label class="form-label">DNI / NIE / CIF *</label><input class="form-input" id="c_prop_dni" placeholder="12345678C"></div>
+          <div class="form-group"><label class="form-label">Domicilio fiscal</label><input class="form-input" id="c_prop_dom" placeholder="Calle, número, ciudad"></div>
+          <div class="form-group"><label class="form-label">IBAN</label><input class="form-input" id="c_prop_iban" placeholder="ES00 0000 0000 0000 0000 0000"></div>
+        </div>
+      </div>
+      <div class="card" style="padding:18px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px">🛡 Avalista</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <button class="ctoggle active" id="cbtn-aval-no" onclick="cToggle('aval',false)">Sin avalista</button>
+          <button class="ctoggle" id="cbtn-aval-si" onclick="cToggle('aval',true)">Con avalista</button>
+        </div>
+        <div id="c_aval_block" style="display:none;background:var(--surface2);border-radius:8px;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group"><label class="form-label">Nombre completo</label><input class="form-input" id="c_aval_nombre" placeholder="Nombre y apellidos"></div>
+          <div class="form-group"><label class="form-label">DNI / NIE</label><input class="form-input" id="c_aval_dni" placeholder="12345678D"></div>
+          <div class="form-group"><label class="form-label">Domicilio</label><input class="form-input" id="c_aval_dom" placeholder="Dirección completa"></div>
+          <div class="form-group"><label class="form-label">Teléfono</label><input class="form-input" id="c_aval_tel" placeholder="+34 600 000 000"></div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:20px">
+        <button class="btn btn-ghost" onclick="cGoStep(0)">← Anterior</button>
+        <button class="btn btn-primary" onclick="cGoStep(2)">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: INMUEBLE -->
+    <div class="csec" id="csec-2">
+      <div style="font-size:18px;font-weight:800;margin-bottom:4px">Datos del inmueble</div>
+      <div style="font-size:13px;color:var(--ink2);margin-bottom:20px">Dirección y características.</div>
+      <div class="card" style="padding:18px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px">🏠 Dirección</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group" style="grid-column:1/-1"><label class="form-label">Dirección completa *</label><input class="form-input" id="c_inm_dir" placeholder="Calle, número, piso, puerta"></div>
+          <div class="form-group"><label class="form-label">Código postal</label><input class="form-input" id="c_inm_cp" placeholder="46001"></div>
+          <div class="form-group"><label class="form-label">Ciudad</label><input class="form-input" id="c_inm_ciudad" value="Valencia"></div>
+          <div class="form-group"><label class="form-label">Referencia catastral</label><input class="form-input" id="c_inm_cat" placeholder="Opcional"></div>
+          <div class="form-group"><label class="form-label">Habitación nº (si aplica)</label><input class="form-input" id="c_inm_hab" placeholder="Ej: Habitación 2"></div>
+          <div class="form-group"><label class="form-label">Nº juegos de llaves</label><input type="number" class="form-input" id="c_inm_llaves" value="1" min="1" max="5"></div>
+          <div class="form-group"><label class="form-label">Estado del inmueble</label>
+            <select class="form-select" id="c_inm_estado"><option value="excelente">Excelente</option><option value="bueno" selected>Bueno</option><option value="normal">Normal</option></select>
+          </div>
+          <div class="form-group" style="grid-column:1/-1"><label class="form-label">Inventario / observaciones</label><textarea class="form-textarea" id="c_inm_inv" placeholder="Ej: Incluye nevera, lavadora, sofá, cama doble. Sin televisión."></textarea></div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:20px">
+        <button class="btn btn-ghost" onclick="cGoStep(1)">← Anterior</button>
+        <button class="btn btn-primary" onclick="cGoStep(3)">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: ECONÓMICO -->
+    <div class="csec" id="csec-3">
+      <div style="font-size:18px;font-weight:800;margin-bottom:4px">Condiciones económicas</div>
+      <div style="font-size:13px;color:var(--ink2);margin-bottom:20px">Renta, fianza y forma de pago.</div>
+      <div class="card" style="padding:18px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px">💶 Renta y fianza</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group"><label class="form-label">Renta mensual (€) *</label><input type="number" class="form-input" id="c_renta" placeholder="800" oninput="cCalcFianza()"></div>
+          <div class="form-group"><label class="form-label">Día de pago</label><input type="number" class="form-input" id="c_dia_pago" value="1" min="1" max="31"></div>
+          <div class="form-group"><label class="form-label">Número de fianzas *</label>
+            <select class="form-select" id="c_num_fianzas" onchange="cCalcFianza()">
+              <option value="1">1 mensualidad</option><option value="2" selected>2 mensualidades</option><option value="3">3 mensualidades</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Importe fianza total (€)</label><input type="number" class="form-input" id="c_importe_fianza" placeholder="Auto"></div>
+        </div>
+      </div>
+      <div class="card" style="padding:18px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px">📊 Prorrata primer mes</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <button class="ctoggle active" id="cbtn-pro-no" onclick="cToggle('pro',false)">Sin prorrata</button>
+          <button class="ctoggle" id="cbtn-pro-si" onclick="cToggle('pro',true)">Con prorrata</button>
+        </div>
+        <div id="c_pro_block" style="display:none;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group"><label class="form-label">Importe prorrateado (€)</label><input type="number" class="form-input" id="c_pro_imp" placeholder="533.33"></div>
+          <div class="form-group"><label class="form-label">Días correspondientes</label><input type="number" class="form-input" id="c_pro_dias" placeholder="20"></div>
+        </div>
+      </div>
+      <div class="card" style="padding:18px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px">💡 Suministros</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          <button class="ctoggle active" id="cbtn-sum-inc" onclick="cSelectSum(this,'incluidos')">Incluidos en renta</button>
+          <button class="ctoggle" id="cbtn-sum-exc" onclick="cSelectSum(this,'excluidos')">A cargo del inquilino</button>
+          <button class="ctoggle" id="cbtn-sum-mix" onclick="cSelectSum(this,'mixto')">Mixto</button>
+        </div>
+        <div id="c_sum_det" style="display:none"><textarea class="form-textarea" id="c_sum_detalle" placeholder="Especifica qué incluye y qué no..."></textarea></div>
+      </div>
+      <div class="card" style="padding:18px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px">💳 Forma de pago</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="ctoggle active" id="cbtn-pago-trans" onclick="cSelectPago(this,'transferencia')">Transferencia bancaria</button>
+          <button class="ctoggle" id="cbtn-pago-wise" onclick="cSelectPago(this,'wise')">WISE</button>
+          <button class="ctoggle" id="cbtn-pago-biz" onclick="cSelectPago(this,'bizum')">Bizum</button>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:20px">
+        <button class="btn btn-ghost" onclick="cGoStep(2)">← Anterior</button>
+        <button class="btn btn-primary" onclick="cGoStep(4)">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: ESPECIALES -->
+    <div class="csec" id="csec-4">
+      <div style="font-size:18px;font-weight:800;margin-bottom:4px">Condiciones especiales</div>
+      <div style="font-size:13px;color:var(--ink2);margin-bottom:20px">Acuerdos específicos del contrato.</div>
+      <div class="card" style="padding:18px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px">🐕 Mascotas</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <button class="ctoggle active" id="cbtn-mas-no" onclick="cToggle('mas',false)">No permitidas</button>
+          <button class="ctoggle" id="cbtn-mas-si" onclick="cToggle('mas',true)">Permitidas</button>
+        </div>
+        <div id="c_mas_block" style="display:none"><input class="form-input" id="c_mas_det" placeholder="Ej: 1 perro raza pequeña (max 10kg), nombre: Bobby"></div>
+      </div>
+      <div class="card" style="padding:18px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px">🚗 Garaje / Parking</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <button class="ctoggle active" id="cbtn-gar-no" onclick="cToggle('gar',false)">No incluye</button>
+          <button class="ctoggle" id="cbtn-gar-si" onclick="cToggle('gar',true)">Incluye garaje</button>
+        </div>
+        <div id="c_gar_block" style="display:none"><input class="form-input" id="c_gar_det" placeholder="Ej: Plaza nº 12, incluida en renta"></div>
+      </div>
+      <div class="card" style="padding:18px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px">✅ Condiciones estándar EasyRent</div>
+        <div id="c_conds">
+          <div class="c-cond checked" onclick="this.classList.toggle('checked');this.querySelector('.cc').textContent=this.classList.contains('checked')?'✓':''">
+            <div class="cc" style="width:20px;height:20px;border-radius:5px;background:var(--gr);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">✓</div>
+            <div style="font-size:13px">Check-out DESPUÉS de las 11:00h: penalización 50€ (L-V) o 70€ (fin de semana). Siempre informar al inquilino con antelación.</div>
+          </div>
+          <div class="c-cond checked" onclick="this.classList.toggle('checked');this.querySelector('.cc').textContent=this.classList.contains('checked')?'✓':''">
+            <div class="cc" style="width:20px;height:20px;border-radius:5px;background:var(--gr);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">✓</div>
+            <div style="font-size:13px">Entrega de llaves: entre semana en oficina, fin de semana en buzón de la oficina.</div>
+          </div>
+          <div class="c-cond checked" onclick="this.classList.toggle('checked');this.querySelector('.cc').textContent=this.classList.contains('checked')?'✓':''">
+            <div class="cc" style="width:20px;height:20px;border-radius:5px;background:var(--gr);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">✓</div>
+            <div style="font-size:13px">Baja del padrón municipal obligatoria para recuperar la fianza.</div>
+          </div>
+          <div class="c-cond checked" onclick="this.classList.toggle('checked');this.querySelector('.cc').textContent=this.classList.contains('checked')?'✓':''">
+            <div class="cc" style="width:20px;height:20px;border-radius:5px;background:var(--gr);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">✓</div>
+            <div style="font-size:13px">Limpieza final obligatoria a cargo del inquilino (tarifa según tipo de inmueble).</div>
+          </div>
+          <div class="c-cond checked" onclick="this.classList.toggle('checked');this.querySelector('.cc').textContent=this.classList.contains('checked')?'✓':''">
+            <div class="cc" style="width:20px;height:20px;border-radius:5px;background:var(--gr);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">✓</div>
+            <div style="font-size:13px">Prohibido el subarriendo total o parcial sin autorización expresa.</div>
+          </div>
+          <div class="c-cond" onclick="this.classList.toggle('checked');this.querySelector('.cc').style.background=this.classList.contains('checked')?'var(--gr)':'';this.querySelector('.cc').textContent=this.classList.contains('checked')?'✓':''">
+            <div class="cc" style="width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0"></div>
+            <div style="font-size:13px">No se permite fumar en el interior del inmueble.</div>
+          </div>
+          <div class="c-cond" onclick="this.classList.toggle('checked');this.querySelector('.cc').style.background=this.classList.contains('checked')?'var(--gr)':'';this.querySelector('.cc').textContent=this.classList.contains('checked')?'✓':''">
+            <div class="cc" style="width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0"></div>
+            <div style="font-size:13px">No se permiten fiestas o reuniones que alteren la convivencia.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="padding:18px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px">🛋 Acuerdos sobre mobiliario</div>
+        <textarea class="form-textarea" id="c_mob" placeholder="Ej: El propietario retirará el sofá rojo antes de la entrada..."></textarea>
+      </div>
+      <div class="card" style="padding:18px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px">📝 Otras condiciones específicas</div>
+        <textarea class="form-textarea" id="c_otras" placeholder="Cualquier otro acuerdo específico..."></textarea>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:20px">
+        <button class="btn btn-ghost" onclick="cGoStep(3)">← Anterior</button>
+        <button class="btn btn-primary" onclick="cGoStep(5)">Revisar y generar →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: GENERAR -->
+    <div class="csec" id="csec-5">
+      <div style="font-size:18px;font-weight:800;margin-bottom:4px">Revisar y generar</div>
+      <div style="font-size:13px;color:var(--ink2);margin-bottom:20px">Verifica los datos antes de generar el contrato.</div>
+      <div id="c_preview" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;font-size:13px;line-height:1.7;max-height:400px;overflow-y:auto"></div>
+      <div id="c_generating" style="display:none;text-align:center;padding:32px">
+        <div style="width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--or);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px"></div>
+        <div style="font-weight:600">Generando contrato con IA...</div>
+        <div style="font-size:12px;color:var(--ink2);margin-top:4px">El Cerebro de EasyRent está redactando el contrato</div>
+      </div>
+      <div id="c_result" style="display:none">
+        <div style="background:var(--grl);border:1px solid rgba(26,122,64,.2);border-radius:9px;padding:12px 15px;font-size:13px;color:#0f5a2e;margin-bottom:14px">✅ Contrato generado. Revísalo antes de enviarlo a firmar.</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;white-space:pre-wrap;font-family:'Courier New',monospace;font-size:11.5px;line-height:1.7;max-height:500px;overflow-y:auto;margin-bottom:14px" id="c_contract_text"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-success" onclick="cCopyContract()">📋 Copiar contrato</button>
+          <button class="btn btn-primary" onclick="cGenerate()">🔄 Regenerar</button>
+          <button class="btn btn-ghost" onclick="cGoStep(0)">← Nuevo contrato</button>
+        </div>
+      </div>
+      <div id="c_gen_nav" style="display:flex;justify-content:space-between;margin-top:20px">
+        <button class="btn btn-ghost" onclick="cGoStep(4)">← Anterior</button>
+        <button class="btn btn-success" style="padding:11px 22px;font-size:14px" onclick="cGenerate()">✨ Generar contrato con IA</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TASK MODAL -->
+<div class="task-modal-overlay" id="taskModal">
+  <div class="task-modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="task-modal-title">Nueva tarea</div>
+      <button class="modal-close" onclick="closeTaskModal()">✕</button>
+    </div>
+    <div style="padding:20px 24px">
+      <div class="form-row" style="margin-bottom:14px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Fecha</label>
+          <input class="form-input" type="date" id="task-date">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Hora</label>
+          <input class="form-input" type="time" id="task-time" value="09:00">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label class="form-label">Proceso SOP a ejecutar</label>
+        <select class="form-select" id="task-sop">
+          <option value="">— Sin proceso (tarea libre) —</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label class="form-label">Título de la tarea</label>
+        <input class="form-input" id="task-title" placeholder="Ej: Check-in Ana García · C/Colón 12">
+      </div>
+      <div class="form-row" style="margin-bottom:14px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Responsable</label>
+          <select class="form-select" id="task-role">
+            <option value="erik">Erik</option>
+            <option value="celina">Celina</option>
+            <option value="tatiana" selected>Tatiana</option>
+            <option value="yesica">Yesica</option>
+            <option value="cs">Cleaning Solutions</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Prioridad</label>
+          <select class="form-select" id="task-priority">
+            <option value="normal">Normal</option>
+            <option value="high">Alta</option>
+            <option value="urgent">Urgente</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:14px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Inmueble / Piso</label>
+          <input class="form-input" id="task-piso" placeholder="C/Colón 12, 3º">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Inquilino / Propietario</label>
+          <input class="form-input" id="task-persona" placeholder="Ana García">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Notas (opcional)</label>
+        <input class="form-input" id="task-notas" placeholder="Detalles adicionales...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeTaskModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveTask()">Guardar tarea</button>
+    </div>
+  </div>
+</div>
+
+<!-- TASK DETAIL MODAL -->
+<div class="task-modal-overlay" id="taskDetailModal">
+  <div class="task-modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="detail-title">Tarea</div>
+      <button class="modal-close" onclick="closeTaskDetail()">✕</button>
+    </div>
+    <div style="padding:20px 24px" id="detail-body"></div>
+    <div class="modal-footer" id="detail-footer">
+      <button class="btn btn-ghost" onclick="closeTaskDetail()">Cerrar</button>
+      <button class="btn btn-danger btn-sm" id="detail-delete-btn">Eliminar</button>
+      <button class="btn btn-primary" id="detail-exec-btn">Ejecutar proceso →</button>
+    </div>
+  </div>
+</div>
+
 
 <script>
 // ══ STORAGE KEYS ══
@@ -701,8 +1152,9 @@ function goTo(view, el) {
   document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
   document.getElementById('view-'+view).classList.add('active');
   if (el) el.classList.add('active');
-  const titles = {dashboard:'Dashboard',processes:'Procesos SOP',execution:'Ejecución',registry:'Registro',assistant:'Asistente IA'};
+  const titles = {dashboard:'Dashboard',processes:'Procesos SOP',execution:'Ejecución',registry:'Registro',assistant:'Asistente IA',calendar:'Calendario',contratos:'Generador de Contratos'};
   document.getElementById('topbar-title').textContent = titles[view]||view;
+  if (view === 'calendar') { populateSopSelect(); renderCalendar(); }
   closeNav();
 }
 function openNav(){document.getElementById('nav').classList.add('open');document.getElementById('overlay').classList.add('show');}
@@ -1058,27 +1510,102 @@ function confirmDelete() {
 }
 
 // ══ EXECUTION ══
+let pendingProcId = null;
+
 function startProc(id) {
+  const existing = getActiveSession(id);
+  // If resuming an in-progress session, go straight in
+  if (existing && existing.status === 'prog') {
+    launchProc(id, existing.ctx || {});
+    return;
+  }
+  // Otherwise show context modal
+  const proc = PROCS.find(p => p.id === id);
+  if (!proc) return;
+  pendingProcId = id;
+  document.getElementById('start-emoji').textContent = proc.emoji;
+  document.getElementById('start-proc-name').textContent = proc.name;
+  document.getElementById('start-proc-resp').textContent = '👤 ' + proc.resp + '  ·  ⏱ ' + proc.dur;
+  document.getElementById('ctx-piso').value = '';
+  document.getElementById('ctx-persona').value = '';
+  document.getElementById('ctx-notas').value = '';
+  document.getElementById('startModal').classList.add('show');
+  setTimeout(() => document.getElementById('ctx-piso').focus(), 100);
+}
+
+function closeStartModal() {
+  document.getElementById('startModal').classList.remove('show');
+  pendingProcId = null;
+}
+
+function confirmStartProc() {
+  if (!pendingProcId) return;
+  const ctx = {
+    piso: document.getElementById('ctx-piso').value.trim(),
+    persona: document.getElementById('ctx-persona').value.trim(),
+    notas: document.getElementById('ctx-notas').value.trim()
+  };
+  closeStartModal();
+  launchProc(pendingProcId, ctx);
+}
+
+function launchProc(id, ctx) {
   curProc = PROCS.find(p => p.id === id);
   if (!curProc) return;
 
-  // Resume existing session if available
   const existing = getActiveSession(id);
   if (existing && existing.status === 'prog') {
     curStep = existing.curStep || 0;
     stepChecks = existing.stepChecks || curProc.stepData.map(s => new Array(s.checks.length).fill(false));
+    ctx = existing.ctx || ctx;
   } else {
     curStep = 0;
     stepChecks = curProc.stepData.map(s => new Array(s.checks.length).fill(false));
   }
 
-  document.getElementById('exec-title').textContent = curProc.emoji + ' ' + curProc.name;
-  document.getElementById('exec-sub').textContent = curProc.desc;
-  document.getElementById('exec-meta').innerHTML = `<span style="font-size:12px;color:var(--ink2)">👤 ${curProc.resp}</span><span style="font-size:12px;color:var(--ink2)">⏱ ${curProc.dur}</span>`;
-  document.getElementById('exec-resp-body').innerHTML = `<div style="font-size:13px;font-weight:500">${curProc.resp}</div><div style="font-size:11px;color:var(--ink3);margin-top:3px;font-family:var(--mono)">Iniciado ${new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}</div>`;
-  document.getElementById('exec-ai-msgs').innerHTML = `<div class="mai bot">Ejecutando "<strong>${curProc.name}</strong>". ¿Tienes alguna duda? 👋</div>`;
+  // Build context subtitle
+  const ctxParts = [];
+  if (ctx.piso) ctxParts.push('🏠 ' + ctx.piso);
+  if (ctx.persona) ctxParts.push('👤 ' + ctx.persona);
+  if (ctx.notas) ctxParts.push('📝 ' + ctx.notas);
+  const ctxStr = ctxParts.join('  ·  ');
 
-  saveSession(); // register as in-progress
+  document.getElementById('exec-title').textContent = curProc.emoji + ' ' + curProc.name;
+  document.getElementById('exec-sub').textContent = ctxStr || curProc.desc;
+
+  // Context tag pills under title
+  const metaParts = [`<span style="font-size:12px;color:var(--ink2)">⏱ ${curProc.resp}</span>`];
+  if (ctx.piso) metaParts.push(`<span style="background:var(--bll);color:var(--bl);font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;">🏠 ${escHtml(ctx.piso)}</span>`);
+  if (ctx.persona) metaParts.push(`<span style="background:var(--grl);color:var(--gr);font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;">👤 ${escHtml(ctx.persona)}</span>`);
+  if (ctx.notas) metaParts.push(`<span style="background:var(--surface2);color:var(--ink2);font-size:11px;padding:3px 9px;border-radius:20px;">📝 ${escHtml(ctx.notas)}</span>`);
+  document.getElementById('exec-meta').innerHTML = metaParts.join('');
+
+  document.getElementById('exec-resp-body').innerHTML = `
+    <div style="font-size:13px;font-weight:500">${curProc.resp}</div>
+    ${ctx.piso ? `<div style="font-size:11px;color:var(--bl);margin-top:4px">🏠 ${escHtml(ctx.piso)}</div>` : ''}
+    ${ctx.persona ? `<div style="font-size:11px;color:var(--gr);margin-top:2px">👤 ${escHtml(ctx.persona)}</div>` : ''}
+    <div style="font-size:11px;color:var(--ink3);margin-top:4px;font-family:var(--mono)">Iniciado ${new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}</div>`;
+
+  document.getElementById('exec-ai-msgs').innerHTML = `<div class="mai bot">Ejecutando "<strong>${curProc.name}</strong>"${ctx.piso?' — '+ctx.piso:''}${ctx.persona?' · '+ctx.persona:''}. ¿Tienes alguna duda? 👋</div>`;
+
+  // Save with context
+  const total = curProc.stepData.reduce((a,s) => a + s.checks.length, 0);
+  const done = stepChecks.flat().filter(Boolean).length;
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  SESSIONS[curProc.id] = {
+    procId: curProc.id,
+    procName: curProc.name,
+    procEmoji: curProc.emoji,
+    curStep,
+    stepChecks,
+    pct,
+    ctx,
+    startedAt: SESSIONS[curProc.id]?.startedAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    status: 'prog'
+  };
+  try { localStorage.setItem(SESSIONS_KEY, JSON.stringify(SESSIONS)); } catch(e){}
+
   renderStepList();
   updateRing();
   renderDashboardSessions();
@@ -1199,66 +1726,98 @@ function renderDashboardSessions() {
   const active = all.filter(s => s.status === 'prog');
   const done = all.filter(s => s.status === 'done');
 
-  // update KPIs
+  // Update KPIs
   const kpiEl = document.getElementById('kpi-inprogress');
-  if (kpiEl) { kpiEl.textContent = active.length; }
+  if (kpiEl) kpiEl.textContent = active.length;
   const kpiDone = document.getElementById('kpi-done-today');
   if (kpiDone) kpiDone.textContent = done.length;
+  const urgentCount = PROCS.filter(p => URGENCY[p.id] === 'urgent').length;
+  const kpiAlerts = document.getElementById('kpi-alerts');
+  if (kpiAlerts) kpiAlerts.textContent = urgentCount;
 
-  if (all.length === 0) {
-    container.innerHTML = `<div style="text-align:center;padding:20px;color:var(--ink3);font-size:13px;">Ejecuta un proceso desde <strong>Procesos SOP</strong> para verlo aquí.</div>`;
-    return;
-  }
+  const allRows = [];
 
-  const rows = [
-    ...active.map(s => `
+  // 1. URGENT / HIGH priority SOPs (always visible in dashboard regardless of status)
+  const urgentProcs = PROCS.filter(p => URGENCY[p.id] === 'urgent' || URGENCY[p.id] === 'high');
+  urgentProcs.sort((a,b) => (URGENCY[a.id]==='urgent'?0:1)-(URGENCY[b.id]==='urgent'?0:1));
+  urgentProcs.forEach(p => {
+    const session = getActiveSession(p.id);
+    const isUrgent = URGENCY[p.id] === 'urgent';
+    const bg = isUrgent ? 'var(--rel)' : 'var(--aml)';
+    const clr = isUrgent ? 'var(--re)' : 'var(--am)';
+    const bdr = isUrgent ? 'rgba(192,57,43,.25)' : 'rgba(196,122,0,.25)';
+    allRows.push(`
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 13px;border-radius:10px;margin-bottom:6px;background:${bg};border:1px solid ${bdr};cursor:pointer;" onclick="startProc(${p.id})">
+      <div style="font-size:16px;flex-shrink:0">${isUrgent?'🔴':'🟡'}</div>
+      <div style="font-size:22px;flex-shrink:0">${p.emoji}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:700;color:${clr}">${escHtml(p.name)}</div>
+        <div style="font-size:11px;margin-top:3px;display:flex;gap:8px;flex-wrap:wrap;color:${clr};opacity:.85">
+          ${session?.ctx?.piso?`<span>🏠 ${escHtml(session.ctx.piso)}</span>`:''}
+          ${session?.ctx?.persona?`<span>👤 ${escHtml(session.ctx.persona)}</span>`:''}
+          ${session&&session.status==='prog'?`<span>● En curso — ${session.pct}%</span>`:`<span>Sin iniciar · toca para ejecutar</span>`}
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;flex-shrink:0">
+        ${session&&session.status==='prog'?`<div style="text-align:right"><div style="font-size:13px;font-weight:800;color:${clr}">${session.pct}%</div><div class="prog-bar" style="width:46px;height:4px;margin-top:2px"><div style="height:100%;border-radius:3px;background:${clr};width:${session.pct}%"></div></div></div>`:''}
+        <button class="btn btn-sm" style="background:${clr};color:#fff;white-space:nowrap;font-size:12px" onclick="event.stopPropagation();startProc(${p.id})">${session&&session.status==='prog'?'Continuar →':'Ejecutar →'}</button>
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();cycleUrgency(${p.id},event)" title="Cambiar prioridad" style="padding:4px 7px;font-size:13px">${isUrgent?'🔴':'🟡'}</button>
+      </div>
+    </div>`);
+  });
+
+  // 2. IN-PROGRESS non-urgent
+  const activeNonUrgent = active.filter(s => !URGENCY[s.procId] || URGENCY[s.procId]==='normal');
+  activeNonUrgent.forEach(s => {
+    allRows.push(`
     <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="startProc(${s.procId})">
       <div style="font-size:20px;width:28px;text-align:center;flex-shrink:0">${s.procEmoji}</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:600">${escHtml(s.procName)}</div>
-        <div style="font-size:11px;color:var(--ink3);margin-top:2px">Actualizado ${formatSessionTime(s.updatedAt)} · Paso ${s.curStep + 1}</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
-        <div style="text-align:right">
-          <div style="font-size:13px;font-weight:700;color:var(--bl)">${s.pct}%</div>
-          <div class="prog-bar" style="width:56px;height:4px;margin-top:3px"><div class="prog-fill b" style="width:${s.pct}%"></div></div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:3px;display:flex;gap:8px;flex-wrap:wrap">
+          ${s.ctx?.piso?`<span style="color:var(--bl)">🏠 ${escHtml(s.ctx.piso)}</span>`:''}
+          ${s.ctx?.persona?`<span style="color:var(--gr)">👤 ${escHtml(s.ctx.persona)}</span>`:''}
+          <span>Paso ${s.curStep+1} · ${formatSessionTime(s.updatedAt)}</span>
         </div>
-        <span style="background:var(--bll);color:var(--bl);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;">● EN CURSO</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:var(--bl)">${s.pct}%</div><div class="prog-bar" style="width:46px;height:4px;margin-top:2px"><div class="prog-fill b" style="width:${s.pct}%"></div></div></div>
+        <span style="background:var(--bll);color:var(--bl);font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;">● EN CURSO</span>
         <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();startProc(${s.procId})" style="white-space:nowrap">Continuar →</button>
       </div>
-    </div>`),
-    ...done.map(s => `
-    <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;opacity:.75;" onclick="reviewProc(${s.procId})">
-      <div style="font-size:20px;width:28px;text-align:center;flex-shrink:0">${s.procEmoji}</div>
+    </div>`);
+  });
+
+  // 3. COMPLETED
+  done.forEach(s => {
+    allRows.push(`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;opacity:.7;" onclick="reviewProc(${s.procId})">
+      <div style="font-size:18px;width:28px;text-align:center;flex-shrink:0">${s.procEmoji}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:600">${escHtml(s.procName)}</div>
-        <div style="font-size:11px;color:var(--ink3);margin-top:2px">Completado ${formatSessionTime(s.completedAt || s.updatedAt)}</div>
+        <div style="font-size:13px;font-weight:500">${escHtml(s.procName)}</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap">
+          ${s.ctx?.piso?`<span>🏠 ${escHtml(s.ctx.piso)}</span>`:''}
+          ${s.ctx?.persona?`<span>👤 ${escHtml(s.ctx.persona)}</span>`:''}
+          <span>Completado ${formatSessionTime(s.completedAt||s.updatedAt)}</span>
+        </div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
-        <span style="background:var(--grl);color:var(--gr);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;">✓ COMPLETADO</span>
-        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();reviewProc(${s.procId})">Ver →</button>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <span style="background:var(--grl);color:var(--gr);font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;">✓ HECHO</span>
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();reviewProc(${s.procId})" style="font-size:11px">Ver →</button>
       </div>
-    </div>`)
-  ];
+    </div>`);
+  });
 
-  // Show urgent SOPs alert at top of dashboard sessions
-  const urgentSOPs = PROCS.filter(p => URGENCY[p.id] === 'urgent');
-  const urgentHtml = urgentSOPs.length > 0 ? `
-    <div style="background:var(--rel);border:1px solid rgba(192,57,43,.2);border-radius:8px;padding:10px 14px;margin-bottom:10px;">
-      <div style="font-size:12px;font-weight:700;color:var(--re);margin-bottom:6px;">🔴 ${urgentSOPs.length} proceso${urgentSOPs.length>1?'s':''} urgente${urgentSOPs.length>1?'s':''}</div>
-      ${urgentSOPs.map(p => `<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;">
-        <span style="font-size:13px;">${p.emoji} ${escHtml(p.name)}</span>
-        <button class="btn btn-danger btn-sm" onclick="startProc(${p.id})" style="font-size:11px">Ejecutar →</button>
-      </div>`).join('')}
-    </div>` : '';
-
-  if (all.length === 0 && urgentSOPs.length === 0) {
-    container.innerHTML = urgentHtml + `<div style="text-align:center;padding:20px;color:var(--ink3);font-size:13px;">Ejecuta un proceso desde <strong>Procesos SOP</strong> para verlo aquí.</div>`;
+  if (allRows.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:24px;color:var(--ink3);font-size:13px;">
+      Ejecuta un proceso desde <strong>Procesos SOP</strong> para verlo aquí.<br>
+      <span style="font-size:12px;display:block;margin-top:6px">Marca SOPs como 🔴 urgente para verlos aquí aunque no los hayas iniciado.</span>
+    </div>`;
     return;
   }
-
-  container.innerHTML = urgentHtml + rows.join('') || `<div style="text-align:center;padding:20px;color:var(--ink3);font-size:13px;">No hay actividad registrada.</div>`;
+  container.innerHTML = allRows.join('');
 }
+
 
 // Review a completed process (show it read-only)
 function reviewProc(id) {
@@ -1284,8 +1843,8 @@ function renderReg() {
   const sessionRows = Object.values(SESSIONS).map(s => ({
     procId: s.procId,
     proc: s.procEmoji + ' ' + s.procName,
-    resp: '—',
-    ctx: '—',
+    resp: s.ctx?.persona || '—',
+    ctx: s.ctx?.piso || (s.ctx?.notas ? '📝 ' + s.ctx.notas : '—'),
     date: formatSessionTime(s.updatedAt),
     status: s.status,
     pct: s.pct,
@@ -1326,6 +1885,498 @@ function renderReg() {
   });
 }
 
+// ══ CALENDAR ══
+const CAL_KEY = 'easyrent_tasks_v1';
+const ROLES = {
+  erik:    {name:'Erik',     color:'#534AB7', bg:'#EEEDFE'},
+  celina:  {name:'Celina',   color:'#0F6E56', bg:'#E1F5EE'},
+  tatiana: {name:'Tatiana',  color:'#993C1D', bg:'#FAECE7'},
+  yesica:  {name:'Yesica',   color:'#185FA5', bg:'#E6F1FB'},
+  cs:      {name:'C.S.',     color:'#5F5E5A', bg:'#F1EFE8'}
+};
+
+let calDate = new Date();
+let calView = 'month';
+let calTasks = loadTasks();
+let activeRoles = new Set(Object.keys(ROLES));
+let editingTaskId = null;
+
+function loadTasks() {
+  try { const s = localStorage.getItem(CAL_KEY); if(s) return JSON.parse(s); } catch(e){}
+  // Seed with some demo tasks from existing sessions
+  return [
+    {id:'t1',date:todayStr(),time:'09:00',title:'Check-in Ana García',sopId:1,role:'yesica',priority:'urgent',piso:'C/Colón 12, 3º',persona:'Ana García',notas:''},
+    {id:'t2',date:todayStr(),time:'11:00',title:'Coordinación limpiezas semanal',sopId:7,role:'tatiana',priority:'normal',piso:'',persona:'',notas:'Viernes - enviar Google Sheet'},
+    {id:'t3',date:offsetDate(1),time:'10:00',title:'Check-out Martínez',sopId:2,role:'yesica',priority:'high',piso:'Avda. Aragón 5',persona:'R. Martínez',notas:''},
+    {id:'t4',date:offsetDate(2),time:'16:00',title:'Devolución fianza',sopId:3,role:'tatiana',priority:'urgent',piso:'C/Xàtiva 22',persona:'L. Pérez',notas:'Revisar padrón municipal'},
+    {id:'t5',date:offsetDate(-1),time:'09:30',title:'Seguro SEAG nuevo contrato',sopId:5,role:'tatiana',priority:'normal',piso:'C/Guillem 8',persona:'K. Ivanova',notas:''},
+    {id:'t6',date:offsetDate(3),time:'10:00',title:'Onboarding propietario',sopId:6,role:'erik',priority:'normal',piso:'C/Cirilo Amorós 40',persona:'Propietario Sánchez',notas:''},
+  ];
+}
+function saveTasks() {
+  try { localStorage.setItem(CAL_KEY, JSON.stringify(calTasks)); } catch(e){}
+}
+function todayStr() {
+  const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function offsetDate(days) {
+  const d = new Date(); d.setDate(d.getDate()+days);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function dateStr(y,m,d) {
+  return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+}
+
+function initCalendar() {
+  renderRoleFilters();
+  renderCalendar();
+  populateSopSelect();
+}
+
+function renderRoleFilters() {
+  document.getElementById('role-filters').innerHTML = Object.entries(ROLES).map(([k,r]) => `
+    <div class="role-pill ${activeRoles.has(k)?'on':''}" onclick="toggleRole('${k}',this)"
+      style="background:${activeRoles.has(k)?r.bg:'var(--surface2)'};color:${r.color};border-color:${activeRoles.has(k)?r.color:'transparent'}">
+      <span style="width:8px;height:8px;border-radius:50%;background:${r.color};display:inline-block"></span>
+      ${r.name}
+    </div>`).join('');
+}
+
+function toggleRole(key, el) {
+  if (activeRoles.has(key)) { activeRoles.delete(key); } else { activeRoles.add(key); }
+  renderRoleFilters();
+  renderCalendar();
+}
+
+function setCalView(v, btn) {
+  calView = v;
+  document.querySelectorAll('.cal-view-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCalendar();
+}
+
+function calPrev() {
+  if (calView==='month') { calDate.setMonth(calDate.getMonth()-1); }
+  else { calDate.setDate(calDate.getDate()-7); }
+  renderCalendar();
+}
+function calNext() {
+  if (calView==='month') { calDate.setMonth(calDate.getMonth()+1); }
+  else { calDate.setDate(calDate.getDate()+7); }
+  renderCalendar();
+}
+function calToday() { calDate = new Date(); renderCalendar(); }
+
+function renderCalendar() {
+  const label = document.getElementById('cal-month-label');
+  const container = document.getElementById('cal-container');
+  if (!label || !container) return;
+  if (calView === 'month') renderMonth(label, container);
+  else renderWeek(label, container);
+}
+
+function renderMonth(label, container) {
+  const y = calDate.getFullYear(), m = calDate.getMonth();
+  const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  label.textContent = months[m] + ' ' + y;
+  const today = todayStr();
+  const firstDay = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const startOffset = firstDay === 0 ? 6 : firstDay - 1;
+
+  let html = `<div class="cal-grid">`;
+  ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].forEach(d => {
+    html += `<div class="cal-dow">${d}</div>`;
+  });
+
+  for (let i = 0; i < startOffset; i++) {
+    const prevDate = new Date(y, m, -startOffset+i+1);
+    html += `<div class="cal-cell other-month" onclick="openTaskModal('${dateStr(prevDate.getFullYear(),prevDate.getMonth(),prevDate.getDate())}',null)">
+      <div class="cal-day-num">${prevDate.getDate()}</div></div>`;
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = dateStr(y, m, d);
+    const isToday = ds === today;
+    const tasks = calTasks.filter(t => t.date === ds && activeRoles.has(t.role));
+    const maxShow = 3;
+    const shown = tasks.slice(0, maxShow);
+    const extra = tasks.length - maxShow;
+    const eventsHtml = shown.map(t => {
+      const r = ROLES[t.role] || ROLES.tatiana;
+      const pri = t.priority==='urgent'?'🔴 ':t.priority==='high'?'🟡 ':'';
+      return `<div class="cal-event" style="background:${r.bg};color:${r.color}" onclick="event.stopPropagation();openTaskDetail('${t.id}')" title="${escHtml(t.title)}">${pri}${escHtml(t.title)}</div>`;
+    }).join('');
+    html += `<div class="cal-cell${isToday?' today':''}" onclick="openTaskModal('${ds}',null)">
+      <div class="cal-day-num">${d}</div>
+      ${eventsHtml}
+      ${extra > 0 ? `<div class="cal-more">+${extra} más</div>` : ''}
+    </div>`;
+  }
+
+  const totalCells = startOffset + daysInMonth;
+  const remaining = (7 - (totalCells % 7)) % 7;
+  for (let i = 1; i <= remaining; i++) {
+    html += `<div class="cal-cell other-month" onclick="openTaskModal('${dateStr(y,m+1,i)}',null)">
+      <div class="cal-day-num">${i}</div></div>`;
+  }
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+function renderWeek(label, container) {
+  const d = new Date(calDate);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  const weekStart = new Date(d);
+  const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const nd = new Date(weekStart); nd.setDate(weekStart.getDate()+i);
+    days.push(nd);
+  }
+  label.textContent = months[days[0].getMonth()] + ' ' + days[0].getDate() + ' – ' + months[days[6].getMonth()] + ' ' + days[6].getDate() + ', ' + days[0].getFullYear();
+  const today = todayStr();
+  const dows = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  let html = `<div class="cal-week-grid">`;
+  html += `<div class="cal-time-col"><div style="height:40px;border-bottom:1px solid var(--border)"></div>`;
+  for (let h = 7; h <= 20; h++) {
+    html += `<div class="cal-time-slot">${h}:00</div>`;
+  }
+  html += `</div>`;
+  days.forEach((dd, di) => {
+    const ds = dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+    const isToday = ds === today;
+    const tasks = calTasks.filter(t => t.date === ds && activeRoles.has(t.role));
+    html += `<div class="cal-week-col">
+      <div class="cal-week-dow" style="${isToday?'color:var(--or);font-weight:800':''}">${dows[di]}<br><span style="font-size:13px">${dd.getDate()}</span></div>`;
+    for (let h = 7; h <= 20; h++) {
+      html += `<div class="cal-week-slot" onclick="openTaskModal('${ds}','${String(h).padStart(2,'0')}:00')"></div>`;
+    }
+    tasks.forEach(t => {
+      const r = ROLES[t.role] || ROLES.tatiana;
+      const timeParts = (t.time||'09:00').split(':');
+      const hr = parseInt(timeParts[0]), min = parseInt(timeParts[1]||0);
+      if (hr < 7 || hr > 20) return;
+      const top = 40 + (hr - 7) * 48 + (min/60)*48;
+      const pri = t.priority==='urgent'?'🔴 ':t.priority==='high'?'🟡 ':'';
+      html += `<div class="cal-week-event" style="top:${top}px;background:${r.bg};color:${r.color};height:44px" onclick="event.stopPropagation();openTaskDetail('${t.id}')">${pri}${escHtml(t.title)}</div>`;
+    });
+    html += `</div>`;
+  });
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+function populateSopSelect() {
+  const sel = document.getElementById('task-sop');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— Sin proceso (tarea libre) —</option>' +
+    PROCS.map(p => `<option value="${p.id}">${p.emoji} ${p.name}</option>`).join('');
+}
+
+function openTaskModal(date, time) {
+  editingTaskId = null;
+  document.getElementById('task-modal-title').textContent = 'Nueva tarea';
+  document.getElementById('task-date').value = date || todayStr();
+  document.getElementById('task-time').value = time || '09:00';
+  document.getElementById('task-sop').value = '';
+  document.getElementById('task-title').value = '';
+  document.getElementById('task-role').value = 'tatiana';
+  document.getElementById('task-priority').value = 'normal';
+  document.getElementById('task-piso').value = '';
+  document.getElementById('task-persona').value = '';
+  document.getElementById('task-notas').value = '';
+  populateSopSelect();
+  document.getElementById('taskModal').classList.add('show');
+  setTimeout(() => document.getElementById('task-title').focus(), 100);
+}
+
+// Auto-fill title from SOP selection
+document.addEventListener('DOMContentLoaded', () => {
+  const sopSel = document.getElementById('task-sop');
+  if (sopSel) {
+    sopSel.addEventListener('change', () => {
+      const proc = PROCS.find(p => p.id === parseInt(sopSel.value));
+      const titleEl = document.getElementById('task-title');
+      if (proc && !titleEl.value) titleEl.value = proc.name;
+    });
+  }
+});
+
+function closeTaskModal() { document.getElementById('taskModal').classList.remove('show'); }
+
+function saveTask() {
+  const title = document.getElementById('task-title').value.trim();
+  const date = document.getElementById('task-date').value;
+  if (!title || !date) { alert('El título y la fecha son obligatorios.'); return; }
+  const task = {
+    id: editingTaskId || 't' + Date.now(),
+    date,
+    time: document.getElementById('task-time').value,
+    title,
+    sopId: parseInt(document.getElementById('task-sop').value) || null,
+    role: document.getElementById('task-role').value,
+    priority: document.getElementById('task-priority').value,
+    piso: document.getElementById('task-piso').value.trim(),
+    persona: document.getElementById('task-persona').value.trim(),
+    notas: document.getElementById('task-notas').value.trim(),
+    status: 'pending'
+  };
+  if (editingTaskId) {
+    const idx = calTasks.findIndex(t => t.id === editingTaskId);
+    if (idx !== -1) calTasks[idx] = task;
+  } else {
+    calTasks.push(task);
+  }
+  saveTasks();
+  closeTaskModal();
+  renderCalendar();
+  renderDashboardSessions();
+}
+
+function openTaskDetail(id) {
+  const task = calTasks.find(t => t.id === id);
+  if (!task) return;
+  const r = ROLES[task.role] || ROLES.tatiana;
+  const proc = task.sopId ? PROCS.find(p => p.id === task.sopId) : null;
+  const priLabel = task.priority==='urgent'?'🔴 Urgente':task.priority==='high'?'🟡 Alta':'⚪ Normal';
+  document.getElementById('detail-title').textContent = task.title;
+  document.getElementById('detail-body').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span style="background:${r.bg};color:${r.color};padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700">${r.name}</span>
+        <span style="background:var(--surface2);color:var(--ink2);padding:3px 10px;border-radius:20px;font-size:12px">${priLabel}</span>
+        <span style="background:var(--surface2);color:var(--ink2);padding:3px 10px;border-radius:20px;font-size:12px">📅 ${task.date} ${task.time}</span>
+      </div>
+      ${task.piso?`<div style="font-size:13px"><span style="color:var(--bl);font-weight:600">🏠 ${escHtml(task.piso)}</span></div>`:''}
+      ${task.persona?`<div style="font-size:13px"><span style="color:var(--gr);font-weight:600">👤 ${escHtml(task.persona)}</span></div>`:''}
+      ${proc?`<div style="background:var(--surface2);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">${proc.emoji}</span>
+        <div><div style="font-size:13px;font-weight:600">${escHtml(proc.name)}</div><div style="font-size:11px;color:var(--ink2)">${proc.stepData.length} pasos · ${proc.dur}</div></div>
+      </div>`:'<div style="font-size:13px;color:var(--ink3)">Sin proceso SOP asignado</div>'}
+      ${task.notas?`<div style="font-size:12px;color:var(--ink2);background:var(--surface2);padding:8px 10px;border-radius:8px">📝 ${escHtml(task.notas)}</div>`:''}
+    </div>`;
+  const execBtn = document.getElementById('detail-exec-btn');
+  if (proc) {
+    execBtn.style.display = '';
+    execBtn.onclick = () => {
+      closeTaskDetail();
+      const ctx = {piso:task.piso, persona:task.persona, notas:task.notas};
+      launchProc(proc.id, ctx);
+    };
+  } else {
+    execBtn.style.display = 'none';
+  }
+  document.getElementById('detail-delete-btn').onclick = () => {
+    calTasks = calTasks.filter(t => t.id !== id);
+    saveTasks();
+    closeTaskDetail();
+    renderCalendar();
+  };
+  document.getElementById('taskDetailModal').classList.add('show');
+}
+function closeTaskDetail() { document.getElementById('taskDetailModal').classList.remove('show'); }
+
+// Sync sessions to calendar tasks (show in-progress sessions as calendar events)
+function syncSessionsToCalendar() {
+  const today = todayStr();
+  Object.values(SESSIONS).forEach(s => {
+    if (!calTasks.find(t => t.id === 'sess_'+s.procId)) {
+      calTasks.push({
+        id: 'sess_'+s.procId,
+        date: today,
+        time: '09:00',
+        title: s.procName + (s.ctx?.piso?' · '+s.ctx.piso:''),
+        sopId: s.procId,
+        role: 'tatiana',
+        priority: URGENCY[s.procId] || 'normal',
+        piso: s.ctx?.piso||'',
+        persona: s.ctx?.persona||'',
+        notas: s.ctx?.notas||'',
+        status: s.status,
+        fromSession: true
+      });
+    }
+  });
+}
+
+// ══ CONTRATOS ══
+let cStep = 0;
+let cTipo = 'habitacion';
+let cSumType = 'incluidos';
+let cPagoType = 'transferencia';
+const cToggles = {};
+
+function cGoStep(n) {
+  document.querySelectorAll('.csec').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.con-tab').forEach((t,i) => {
+    t.style.background = i === n ? 'var(--or)' : i < n ? 'var(--grl)' : 'var(--surface)';
+    t.style.color = i === n ? '#fff' : i < n ? 'var(--gr)' : 'var(--ink3)';
+  });
+  document.getElementById('csec-'+n)?.classList.add('active');
+  cStep = n;
+  if(n === 5) cRenderPreview();
+}
+
+function cSelectTipo(el, tipo) {
+  document.querySelectorAll('#csec-0 .ctoggle').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  cTipo = tipo;
+}
+
+function cToggle(key, show) {
+  cToggles[key] = show;
+  const block = document.getElementById('c_'+key+'_block');
+  if(block) block.style.display = show ? 'grid' : 'none';
+  if(key==='inq2'||key==='aval'||key==='pro'||key==='mas'||key==='gar') {
+    if(block) block.style.display = show ? (key==='mas'||key==='gar'?'block':'grid') : 'none';
+  }
+  document.getElementById('cbtn-'+key+'-no')?.classList.toggle('active', !show);
+  document.getElementById('cbtn-'+key+'-si')?.classList.toggle('active', show);
+}
+
+function cSelectSum(el, tipo) {
+  cSumType = tipo;
+  document.querySelectorAll('#csec-3 .card:nth-child(3) .ctoggle').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('c_sum_det').style.display = tipo === 'mixto' ? 'block' : 'none';
+}
+
+function cSelectPago(el, tipo) {
+  cPagoType = tipo;
+  document.querySelectorAll('#csec-3 .card:nth-child(4) .ctoggle').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function cCalcFianza() {
+  const r = parseFloat(document.getElementById('c_renta')?.value) || 0;
+  const n = parseInt(document.getElementById('c_num_fianzas')?.value) || 1;
+  const el = document.getElementById('c_importe_fianza');
+  if(el) el.value = (r*n).toFixed(2);
+}
+
+function cv(id) { return document.getElementById(id)?.value?.trim() || ''; }
+
+function cGetConds() {
+  const conds = [];
+  document.querySelectorAll('.c-cond.checked').forEach(el => conds.push(el.querySelector('div:last-child').textContent.trim()));
+  return conds;
+}
+
+function cRenderPreview() {
+  const tipos = {habitacion:'Habitación',media:'Media estancia',larga:'Larga estancia',gestion:'Gestión propietario'};
+  const sum = {incluidos:'Incluidos en renta',excluidos:'A cargo del inquilino',mixto:'Mixto'};
+  const pago = {transferencia:'Transferencia bancaria',wise:'WISE',bizum:'Bizum'};
+  let html = '';
+  const fields = [
+    {g:'📋 Contrato'},{l:'Tipo',v:tipos[cTipo]},{l:'Inicio',v:cv('c_fecha_inicio')},{l:'Fin',v:cv('c_fecha_fin')},{l:'Justificación',v:cv('c_justificacion')},
+    {g:'👤 Inquilino'},{l:'Nombre',v:cv('c_inq1_nombre')},{l:'DNI/NIE',v:cv('c_inq1_dni')},{l:'Tel',v:cv('c_inq1_tel')},{l:'Email',v:cv('c_inq1_email')},
+    ...(cToggles.inq2?[{g:'👥 2º Inquilino'},{l:'Nombre',v:cv('c_inq2_nombre')},{l:'DNI/NIE',v:cv('c_inq2_dni')}]:[]),
+    ...(cToggles.aval?[{g:'🛡 Avalista'},{l:'Nombre',v:cv('c_aval_nombre')},{l:'DNI/NIE',v:cv('c_aval_dni')}]:[]),
+    {g:'🏘 Propietario'},{l:'Nombre',v:cv('c_prop_nombre')},{l:'DNI/NIE/CIF',v:cv('c_prop_dni')},{l:'IBAN',v:cv('c_prop_iban')},
+    {g:'🏠 Inmueble'},{l:'Dirección',v:cv('c_inm_dir')},{l:'CP / Ciudad',v:cv('c_inm_cp')+' '+cv('c_inm_ciudad')},
+    ...(cv('c_inm_hab')?[{l:'Habitación',v:cv('c_inm_hab')}]:[]),
+    {g:'💶 Económico'},{l:'Renta',v:cv('c_renta')+'€/mes'},{l:'Fianza',v:cv('c_num_fianzas')+' mes/es ('+cv('c_importe_fianza')+'€)'},{l:'Forma pago',v:pago[cPagoType]},{l:'Suministros',v:sum[cSumType]},
+    ...(cToggles.pro?[{l:'Prorrata',v:cv('c_pro_imp')+'€ ('+cv('c_pro_dias')+' días)'}]:[]),
+    {g:'✅ Condiciones'},{l:'Mascotas',v:cToggles.mas?cv('c_mas_det'):'No permitidas'},{l:'Garaje',v:cToggles.gar?cv('c_gar_det'):'No incluido'},
+    ...(cv('c_otras')?[{l:'Otras',v:cv('c_otras')}]:[]),
+  ];
+  fields.forEach(f => {
+    if(f.g) html += `<div style="font-size:13px;font-weight:700;color:var(--or);margin:12px 0 6px">${f.g}</div>`;
+    else html += `<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)"><div style="font-weight:600;min-width:140px;font-size:12px;color:var(--ink2)">${f.l}</div><div style="font-size:13px;color:${!f.v?'var(--re)':'var(--ink)'}">${f.v||'⚠️ Sin rellenar'}</div></div>`;
+  });
+  document.getElementById('c_preview').innerHTML = html;
+}
+
+async function cGenerate() {
+  const missing = [];
+  if(!cv('c_inq1_nombre')) missing.push('Nombre del inquilino');
+  if(!cv('c_inq1_dni')) missing.push('DNI del inquilino');
+  if(!cv('c_prop_nombre')) missing.push('Nombre del propietario');
+  if(!cv('c_inm_dir')) missing.push('Dirección del inmueble');
+  if(!cv('c_renta')) missing.push('Renta mensual');
+  if(!cv('c_fecha_inicio')) missing.push('Fecha de inicio');
+  if(!cv('c_fecha_fin')) missing.push('Fecha de fin');
+  if(missing.length) { alert('Faltan datos obligatorios:\n• '+missing.join('\n• ')); return; }
+
+  document.getElementById('c_gen_nav').style.display = 'none';
+  document.getElementById('c_generating').style.display = 'block';
+  document.getElementById('c_result').style.display = 'none';
+
+  const tipos = {habitacion:'arrendamiento de habitación en piso compartido',media:'arrendamiento de media estancia',larga:'arrendamiento de larga estancia',gestion:'contrato de gestión de propiedad'};
+  const sum = {incluidos:'Los suministros están incluidos en la renta mensual.',excluidos:'Los suministros corren a cargo exclusivo del arrendatario.',mixto:cv('c_sum_detalle')};
+  const pago = {transferencia:'transferencia bancaria',wise:'WISE',bizum:'Bizum'};
+  const conds = cGetConds();
+
+  const prompt = `Redacta un contrato profesional y completo de ${tipos[cTipo]} para EasyRent Valencia (Digirent Solutions S.L., Valencia, España), que actúa como agente gestora del propietario.
+
+DATOS:
+- Tipo: ${tipos[cTipo]}
+- Inicio: ${cv('c_fecha_inicio')} | Fin: ${cv('c_fecha_fin')}
+- Justificación temporalidad: ${cv('c_justificacion')}
+
+ARRENDATARIO/S:
+- Inquilino 1: ${cv('c_inq1_nombre')}, DNI/NIE: ${cv('c_inq1_dni')}, Nac: ${cv('c_inq1_nac')||'No especificada'}, Tel: ${cv('c_inq1_tel')}, Email: ${cv('c_inq1_email')}
+${cToggles.inq2?`- Inquilino 2: ${cv('c_inq2_nombre')}, DNI/NIE: ${cv('c_inq2_dni')}, Tel: ${cv('c_inq2_tel')}` : ''}
+${cToggles.aval?`- Avalista: ${cv('c_aval_nombre')}, DNI/NIE: ${cv('c_aval_dni')}, Dom: ${cv('c_aval_dom')}, Tel: ${cv('c_aval_tel')}` : ''}
+
+ARRENDADOR:
+- ${cv('c_prop_nombre')}, DNI/NIE/CIF: ${cv('c_prop_dni')}, Dom: ${cv('c_prop_dom')||'Valencia'}
+- Representado por EasyRent Valencia (Digirent Solutions S.L.)
+${cv('c_prop_iban')?`- IBAN: ${cv('c_prop_iban')}`:''}
+
+INMUEBLE:
+- Dirección: ${cv('c_inm_dir')}, CP: ${cv('c_inm_cp')}, ${cv('c_inm_ciudad')||'Valencia'}
+${cv('c_inm_hab')?`- Habitación: ${cv('c_inm_hab')}`:''}
+${cv('c_inm_cat')?`- Ref. catastral: ${cv('c_inm_cat')}`:''}
+- Estado: ${cv('c_inm_estado')||'Bueno'} | Llaves: ${cv('c_inm_llaves')||'1'} juego/s
+- Inventario: ${cv('c_inm_inv')||'Según documento de inventario anexo'}
+
+CONDICIONES ECONÓMICAS:
+- Renta: ${cv('c_renta')}€/mes, día de pago: ${cv('c_dia_pago')||'1'} de cada mes
+- Forma de pago: ${pago[cPagoType]}
+- Fianza: ${cv('c_num_fianzas')} mensualidad/es = ${cv('c_importe_fianza')}€
+${cToggles.pro?`- Prorrata primer mes: ${cv('c_pro_imp')}€ (${cv('c_pro_dias')} días)`:''}
+- Suministros: ${sum[cSumType]}
+
+CONDICIONES ESPECIALES:
+${cToggles.mas?`- Mascotas PERMITIDAS: ${cv('c_mas_det')}`:'- Mascotas: NO permitidas'}
+${cToggles.gar?`- Garaje INCLUIDO: ${cv('c_gar_det')}`:'- Garaje: No incluido'}
+${cv('c_mob')?`- Acuerdos mobiliario: ${cv('c_mob')}`:''}
+${cv('c_otras')?`- Otras condiciones: ${cv('c_otras')}`:''}
+
+CLÁUSULAS ESTÁNDAR EASYRENT:
+${conds.map(c=>'- '+c).join('\n')}
+
+INSTRUCCIONES:
+1. Redacta el contrato COMPLETO en español con lenguaje jurídico profesional según la LAU
+2. Incluye todas las cláusulas estándar de arrendamiento
+3. Incluye lugar (Valencia), fecha y espacios para firmas de TODAS las partes
+4. NO uses "[...]" ni resúmenes — el contrato debe ser completo y listo para firmar
+5. Incluye cláusula de jurisdicción (Juzgados de Valencia)
+6. Numera todas las cláusulas`;
+
+  try {
+    const r = await fetch('/.netlify/functions/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:prompt}]})});
+    const d = await r.json();
+    const contract = d.content?.[0]?.text || 'Error al generar.';
+    document.getElementById('c_generating').style.display = 'none';
+    document.getElementById('c_result').style.display = 'block';
+    document.getElementById('c_contract_text').textContent = contract;
+  } catch(err) {
+    document.getElementById('c_generating').style.display = 'none';
+    document.getElementById('c_gen_nav').style.display = 'flex';
+    alert('Error de conexión con el asistente IA.');
+  }
+}
+
+function cCopyContract() {
+  const text = document.getElementById('c_contract_text').textContent;
+  navigator.clipboard.writeText(text).then(() => alert('✅ Contrato copiado. Puedes pegarlo en Word.'));
+}
+
 // ══ UTILS ══
 function escHtml(t) {
   if (!t) return '';
@@ -1337,6 +2388,8 @@ URGENCY = loadUrgency();
 renderProcs();
 renderReg();
 renderDashboardSessions();
+syncSessionsToCalendar();
+initCalendar();
 </script>
 </body>
 </html>

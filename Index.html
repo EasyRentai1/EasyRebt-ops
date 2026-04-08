@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>EasyRent — Centro de Operaciones</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+:root {
+  --bg:#f8f7f4;--surface:#fff;--surface2:#f0ede8;--border:#e5e1da;
+  --ink:#1c1a17;--ink2:#6b6560;--ink3:#b5b0a8;
+  --or:#e8530a;--orl:#fff3ee;--ord:#c44508;
+  --gr:#1a7a40;--grl:#ebf7f0;--bl:#1a52a0;--bll:#ebf1fb;
+  --am:#c47a00;--aml:#fdf5e0;--re:#c0392b;--rel:#fdecea;
+  --font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;
+  --r:14px;--sh:0 1px 12px rgba(28,26,23,.07);--shm:0 4px 24px rgba(28,26,23,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;min-height:100vh;}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;bottom:0;width:256px;background:var(--ink);display:flex;flex-direction:column;z-index:200;transition:transform .3s cubic-bezier(.4,0,.2,1);}
+.nav-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:12px;}
+.nlb{background:var(--or);color:#fff;font-weight:800;font-size:15px;padding:6px 10px;border-radius:10px;letter-spacing:-.02em;}
+.nln{font-size:16px;font-weight:700;color:#fff;letter-spacing:-.02em;}
+.nls{font-size:11px;color:rgba(255,255,255,.35);margin-top:1px;}
+.nav-sec{padding:18px 14px 5px;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.28);}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 10px;margin:1px 8px;border-radius:9px;cursor:pointer;color:rgba(255,255,255,.5);font-size:13.5px;transition:all .15s;}
+.ni:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.85);}
+.ni.active{background:var(--or);color:#fff;font-weight:600;}
+.ni .ico{font-size:15px;width:22px;text-align:center;flex-shrink:0;}
+.nbadge{margin-left:auto;font-size:10px;font-weight:700;background:rgba(255,255,255,.14);padding:1px 7px;border-radius:20px;}
+.ni.active .nbadge{background:rgba(255,255,255,.25);}
+.nav-footer{margin-top:auto;padding:14px 16px;border-top:1px solid rgba(255,255,255,.07);}
+.user-row{display:flex;align-items:center;gap:10px;}
+.ua{width:34px;height:34px;border-radius:50%;background:var(--or);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.un{font-size:13px;font-weight:600;color:rgba(255,255,255,.8);}
+.ur{font-size:11px;color:rgba(255,255,255,.35);}
+
+/* MAIN */
+.main{margin-left:256px;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(248,247,244,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:13px 28px;display:flex;align-items:center;justify-content:space-between;}
+.topbar-title{font-size:17px;font-weight:700;letter-spacing:-.02em;}
+.topbar-right{display:flex;gap:8px;align-items:center;}
+.btn{padding:8px 16px;border-radius:9px;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;}
+.btn-primary{background:var(--or);color:#fff;}
+.btn-primary:hover{background:var(--ord);transform:translateY(-1px);box-shadow:0 4px 12px rgba(232,83,10,.3);}
+.btn-ghost{background:transparent;color:var(--ink2);border:1px solid var(--border);}
+.btn-ghost:hover{background:var(--surface2);color:var(--ink);}
+.btn-sm{padding:6px 12px;font-size:12px;}
+.btn-danger{background:var(--rel);color:var(--re);border:1px solid rgba(192,57,43,.2);}
+.btn-success{background:var(--grl);color:var(--gr);border:1px solid rgba(26,122,64,.2);}
+.hamburger{display:none;background:none;border:none;font-size:20px;cursor:pointer;padding:4px;margin-right:8px;color:var(--ink);}
+.content{padding:26px 28px;flex:1;}
+
+/* VIEWS */
+.view{display:none;animation:fadeUp .22s ease;}
+.view.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;position:relative;overflow:hidden;transition:box-shadow .2s;}
+.kpi:hover{box-shadow:var(--sh);}
+.kpi-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin-bottom:8px;}
+.kpi-val{font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1;}
+.kpi-sub{font-size:12px;color:var(--ink2);margin-top:5px;}
+.kpi-ico{position:absolute;top:14px;right:14px;font-size:26px;opacity:.1;}
+.kpi.orange .kpi-val{color:var(--or);}
+.kpi.green .kpi-val{color:var(--gr);}
+.kpi.blue .kpi-val{color:var(--bl);}
+.kpi.amber .kpi-val{color:var(--am);}
+
+/* CARDS */
+.dash-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.card-hdr{padding:16px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:14px;font-weight:700;letter-spacing:-.01em;}
+.card-body{padding:14px 18px;}
+.act-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.act-item:last-child{border-bottom:none;}
+.act-dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.act-dot.g{background:var(--gr);}
+.act-dot.o{background:var(--or);}
+.act-dot.b{background:var(--bl);}
+.act-dot.a{background:var(--am);}
+.act-txt{flex:1;font-size:13px;line-height:1.45;}
+.act-time{font-size:11px;color:var(--ink3);white-space:nowrap;font-family:var(--mono);}
+.prog-row{margin-bottom:13px;}
+.prog-lbl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;color:var(--ink2);}
+.prog-lbl strong{color:var(--ink);font-weight:500;}
+.prog-bar{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;}
+.prog-fill.o{background:var(--or);}
+.prog-fill.g{background:var(--gr);}
+.prog-fill.b{background:var(--bl);}
+
+/* PROCESSES */
+.filter-bar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px;align-items:center;}
+.fchip{padding:6px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;background:var(--surface);color:var(--ink2);}
+.fchip:hover{border-color:var(--or);color:var(--or);}
+.fchip.active{background:var(--or);border-color:var(--or);color:#fff;}
+.proc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;}
+.proc-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:18px;transition:all .2s;position:relative;}
+.proc-card:hover{border-color:var(--or);box-shadow:var(--shm);}
+.proc-card.urgent{border-color:var(--re);box-shadow:0 0 0 3px rgba(192,57,43,.07);}
+.proc-card.urgent:hover{border-color:var(--re);}
+.urgency-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r) var(--r) 0 0;}
+.urgency-bar.urgent{background:var(--re);}
+.urgency-bar.high{background:var(--am);}
+.urgency-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em;}
+.urgency-badge.urgent{background:var(--rel);color:var(--re);}
+.urgency-badge.high{background:var(--aml);color:var(--am);}
+.urgency-btn{width:28px;height:28px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--ink3);}
+.urgency-btn:hover{border-color:var(--re);background:var(--rel);color:var(--re);}
+.pc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.pc-emoji{font-size:30px;line-height:1;}
+.pc-actions{display:flex;gap:5px;}
+.tag{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em;}
+.tag-op{background:var(--bll);color:var(--bl);}
+.tag-in{background:var(--grl);color:var(--gr);}
+.tag-prop{background:var(--aml);color:var(--am);}
+.tag-admin{background:var(--orl);color:var(--or);}
+.pc-name{font-size:15px;font-weight:700;letter-spacing:-.01em;margin-bottom:5px;}
+.pc-desc{font-size:12px;color:var(--ink2);line-height:1.5;margin-bottom:12px;}
+.pc-meta{display:flex;gap:12px;font-size:11px;color:var(--ink3);}
+.pc-footer{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:6px;}
+
+/* EXECUTION */
+.exec-wrap{display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:start;}
+.exec-hdr{margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--border);}
+.exec-title{font-size:24px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px;}
+.exec-sub{font-size:13px;color:var(--ink2);}
+.step{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:10px;transition:all .2s;}
+.step.current{border-color:var(--or);box-shadow:0 0 0 3px rgba(232,83,10,.07);}
+.step.done{border-color:var(--gr);opacity:.72;}
+.step.locked{opacity:.38;pointer-events:none;}
+.step-hdr{display:flex;align-items:center;gap:12px;padding:14px 16px;}
+.step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.step.pending .step-num{background:var(--surface2);color:var(--ink3);}
+.step.current .step-num{background:var(--or);color:#fff;}
+.step.done .step-num{background:var(--gr);color:#fff;}
+.step.locked .step-num{background:var(--surface2);color:var(--ink3);}
+.step-info{flex:1;}
+.step-name{font-weight:600;font-size:14px;}
+.step-meta{font-size:11px;color:var(--ink3);margin-top:2px;}
+.step-body{padding:0 16px 16px;display:none;}
+.step.current .step-body{display:block;}
+.step-desc{font-size:13px;color:var(--ink2);line-height:1.65;margin-bottom:14px;padding:11px 13px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--or);}
+.checklist{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;}
+.ci{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .14s;font-size:13px;}
+.ci:hover{background:var(--surface2);}
+.ci.checked{background:var(--grl);border-color:var(--gr);}
+.ci.checked .cbox{background:var(--gr);border-color:var(--gr);color:#fff;}
+.cbox{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all .14s;}
+
+/* SIDEBAR CARDS */
+.s-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:14px;}
+.s-card-title{padding:13px 15px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px;}
+.s-card-body{padding:13px 15px;}
+.ring-wrap{display:flex;flex-direction:column;align-items:center;padding:8px 0;}
+.ring-svg{transform:rotate(-90deg);}
+.ring-bg{fill:none;stroke:var(--surface2);stroke-width:7;}
+.ring-fg{fill:none;stroke:var(--or);stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset .5s ease;}
+.ring-pct{font-size:24px;font-weight:800;color:var(--or);margin-top:10px;}
+.ring-sub{font-size:11px;color:var(--ink2);}
+.mini-ai-msgs{max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:7px;margin-bottom:9px;scrollbar-width:thin;}
+.mai{font-size:12px;line-height:1.5;padding:8px 10px;border-radius:8px;}
+.mai.bot{background:var(--orl);}
+.mai.usr{background:var(--surface2);text-align:right;}
+.ai-row{display:flex;gap:6px;}
+.ai-in{flex:1;border:1px solid var(--border);border-radius:8px;padding:6px 9px;font-size:12px;font-family:var(--font);background:var(--bg);color:var(--ink);outline:none;}
+.ai-in:focus{border-color:var(--or);}
+.ai-btn{width:30px;height:30px;border-radius:8px;background:var(--or);border:none;cursor:pointer;color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.ai-btn:hover{background:var(--ord);}
+
+/* REGISTRY */
+.tbl{width:100%;border-collapse:collapse;background:var(--surface);border-radius:var(--r);overflow:hidden;border:1px solid var(--border);}
+.tbl th{background:var(--surface2);padding:11px 15px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid var(--border);}
+.tbl td{padding:12px 15px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tbody tr:hover{background:var(--surface2);}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.pill-done{background:var(--grl);color:var(--gr);}
+.pill-prog{background:var(--bll);color:var(--bl);}
+.pill-pend{background:var(--aml);color:var(--am);}
+
+/* CHAT */
+.chat-layout{display:grid;grid-template-columns:1fr 260px;gap:18px;height:calc(100vh - 155px);}
+.chat-main{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.chat-msgs{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin;}
+.cmsg{display:flex;gap:9px;max-width:88%;}
+.cmsg.u{align-self:flex-end;flex-direction:row-reverse;}
+.cavatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.cmsg.b .cavatar{background:var(--or);}
+.cmsg.u .cavatar{background:var(--ink);}
+.cbubble{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.6;}
+.cmsg.b .cbubble{background:var(--surface2);border-bottom-left-radius:3px;}
+.cmsg.u .cbubble{background:var(--or);color:#fff;border-bottom-right-radius:3px;}
+.cbubble strong{font-weight:700;}
+.cbubble ul,.cbubble ol{padding-left:16px;margin:6px 0;}
+.cbubble li{margin-bottom:3px;}
+.chat-inp-area{padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:8px;}
+.chat-in{flex:1;border:1px solid var(--border);border-radius:10px;padding:10px 13px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--ink);outline:none;resize:none;}
+.chat-in:focus{border-color:var(--or);}
+.chat-send{padding:10px 14px;background:var(--or);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:16px;transition:background .15s;}
+.chat-send:hover{background:var(--ord);}
+.chat-side{display:flex;flex-direction:column;gap:13px;overflow-y:auto;}
+.sop-btn{padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;background:var(--surface);color:var(--ink2);width:100%;text-align:left;font-family:var(--font);}
+.sop-btn:hover{border-color:var(--or);background:var(--orl);color:var(--or);}
+.thinking{display:flex;gap:4px;padding:2px 0;}
+.thinking span{width:6px;height:6px;border-radius:50%;background:var(--ink3);animation:td 1.2s infinite;}
+.thinking span:nth-child(2){animation-delay:.2s;}
+.thinking span:nth-child(3){animation-delay:.4s;}
+@keyframes td{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
+
+/* ══ EDITOR MODAL ══ */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,26,23,.55);z-index:500;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--surface);border-radius:18px;width:100%;max-width:760px;box-shadow:0 20px 60px rgba(28,26,23,.2);animation:fadeUp .25s ease;}
+.modal-hdr{padding:22px 24px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:18px;font-weight:800;letter-spacing:-.02em;}
+.modal-close{width:32px;height:32px;border-radius:8px;background:var(--surface2);border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--ink2);}
+.modal-close:hover{background:var(--border);}
+.modal-body{padding:22px 24px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
+
+/* FORM ELEMENTS */
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;}
+.form-input,.form-textarea,.form-select{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:10px 13px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--ink);outline:none;transition:border-color .15s;}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--or);}
+.form-textarea{resize:vertical;min-height:80px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* STEP EDITOR */
+.step-editor{background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:12px;position:relative;}
+.step-editor-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.step-num-badge{width:24px;height:24px;border-radius:50%;background:var(--or);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.step-editor-title{font-size:13px;font-weight:700;flex:1;}
+.step-remove-btn{width:26px;height:26px;border-radius:6px;background:var(--rel);border:none;cursor:pointer;color:var(--re);font-size:14px;display:flex;align-items:center;justify-content:center;}
+.checks-editor{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+.check-edit-row{display:flex;gap:6px;align-items:center;}
+.check-edit-input{flex:1;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:12px;font-family:var(--font);background:var(--surface);color:var(--ink);outline:none;}
+.check-edit-input:focus{border-color:var(--or);}
+.check-remove{width:24px;height:24px;border-radius:6px;background:none;border:1px solid var(--border);cursor:pointer;color:var(--ink3);font-size:13px;display:flex;align-items:center;justify-content:center;}
+.check-remove:hover{background:var(--rel);color:var(--re);border-color:transparent;}
+.add-check-btn{font-size:12px;color:var(--or);background:none;border:1px dashed rgba(232,83,10,.3);border-radius:7px;padding:6px 10px;cursor:pointer;font-family:var(--font);font-weight:600;width:100%;margin-top:4px;}
+.add-check-btn:hover{background:var(--orl);}
+.add-step-btn{width:100%;padding:12px;border:2px dashed var(--border);border-radius:10px;background:none;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:600;color:var(--ink3);transition:all .15s;margin-bottom:8px;}
+.add-step-btn:hover{border-color:var(--or);color:var(--or);background:var(--orl);}
+
+/* NEW SOP MODAL specifics */
+.emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-top:6px;}
+.emoji-opt{width:36px;height:36px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.emoji-opt:hover,.emoji-opt.sel{border-color:var(--or);background:var(--orl);}
+
+/* CONFIRM DIALOG */
+.confirm-box{position:fixed;inset:0;background:rgba(28,26,23,.5);z-index:600;display:none;align-items:center;justify-content:center;}
+.confirm-box.show{display:flex;}
+.confirm-inner{background:var(--surface);border-radius:14px;padding:24px;max-width:360px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(28,26,23,.2);}
+.confirm-title{font-size:16px;font-weight:700;margin-bottom:8px;}
+.confirm-msg{font-size:13px;color:var(--ink2);margin-bottom:20px;line-height:1.5;}
+.confirm-btns{display:flex;gap:8px;justify-content:center;}
+
+/* MOBILE */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:180;}
+.overlay.show{display:block;}
+@media(max-width:900px){
+  .nav{transform:translateX(-100%);}
+  .nav.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .hamburger{display:block;}
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  .dash-grid{grid-template-columns:1fr;}
+  .exec-wrap{grid-template-columns:1fr;}
+  .chat-layout{grid-template-columns:1fr;}
+  .chat-side{display:none;}
+  .proc-grid{grid-template-columns:1fr;}
+  .content{padding:16px;}
+  .form-row{grid-template-columns:1fr;}
+}
+@media(max-width:480px){.kpi-row{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="closeNav()"></div>
+
+<!-- EDITOR MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="edit-modal-title">Editar SOP</div>
+      <button class="modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nombre del SOP</label>
+          <input class="form-input" id="edit-name" placeholder="Ej: Check-in de Inquilino">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Emoji</label>
+          <input class="form-input" id="edit-emoji" placeholder="🔑" style="font-size:20px;text-align:center;">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Categoría</label>
+          <select class="form-select" id="edit-cat">
+            <option value="op">Operaciones</option>
+            <option value="in">Inquilinos</option>
+            <option value="prop">Propietarios</option>
+            <option value="admin">Administrativo</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Responsable</label>
+          <input class="form-input" id="edit-resp" placeholder="Ej: Tatiana + Yesica">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Duración estimada</label>
+          <input class="form-input" id="edit-dur" placeholder="Ej: 30 min">
+        </div>
+        <div></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción</label>
+        <textarea class="form-textarea" id="edit-desc" placeholder="Describe brevemente el objetivo de este SOP..."></textarea>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:700;">Pasos del proceso</div>
+        <span style="font-size:11px;color:var(--ink3)" id="steps-count"></span>
+      </div>
+      <div id="steps-editor"></div>
+      <button class="add-step-btn" onclick="addStep()">+ Añadir paso</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeEditModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveProc()">💾 Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-box" id="confirmBox">
+  <div class="confirm-inner">
+    <div class="confirm-title">¿Eliminar este SOP?</div>
+    <div class="confirm-msg">Esta acción no se puede deshacer. El SOP y todos sus pasos serán eliminados permanentemente.</div>
+    <div class="confirm-btns">
+      <button class="btn btn-ghost" onclick="closeConfirm()">Cancelar</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<nav class="nav" id="nav">
+  <div class="nav-logo">
+    <div class="nlb">ER</div>
+    <div><div class="nln">EasyRent</div><div class="nls">Centro de Operaciones</div></div>
+  </div>
+  <div class="nav-sec">Principal</div>
+  <div class="ni active" onclick="goTo('dashboard',this)"><span class="ico">◼</span>Dashboard</div>
+  <div class="ni" onclick="goTo('processes',this)"><span class="ico">☰</span>Procesos SOP<span class="nbadge" id="nb-p">11</span></div>
+  <div class="nav-sec">Operaciones</div>
+  <div class="ni" onclick="goTo('registry',this)"><span class="ico">◎</span>Registro</div>
+  <div class="ni" onclick="goTo('assistant',this)"><span class="ico">✦</span>Asistente IA</div>
+  <div class="nav-footer">
+    <div class="user-row">
+      <div class="ua">ER</div>
+      <div><div class="un">EasyRent Valencia</div><div class="ur">Digirent Solutions S.L.</div></div>
+    </div>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center">
+      <button class="hamburger" onclick="openNav()">☰</button>
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost btn-sm" onclick="openNewProcModal()">+ Nuevo SOP</button>
+      <button class="btn btn-primary btn-sm" onclick="goTo('assistant',document.querySelector('[onclick*=assistant]'))">✦ Asistente IA</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="view active" id="view-dashboard">
+      <div class="kpi-row">
+        <div class="kpi orange"><div class="kpi-lbl">SOPs activos</div><div class="kpi-val" id="kpi-sops">11</div><div class="kpi-sub">Todos operativos</div><div class="kpi-ico">📋</div></div>
+        <div class="kpi green"><div class="kpi-lbl">Completados hoy</div><div class="kpi-val" id="kpi-done-today">0</div><div class="kpi-sub">procesos finalizados</div><div class="kpi-ico">✓</div></div>
+        <div class="kpi blue"><div class="kpi-lbl">En curso</div><div class="kpi-val" id="kpi-inprogress">0</div><div class="kpi-sub">procesos activos</div><div class="kpi-ico">▶</div></div>
+        <div class="kpi blue"><div class="kpi-lbl">Cumplimiento</div><div class="kpi-val">91%</div><div class="kpi-sub">↑ 3% esta semana</div><div class="kpi-ico">◎</div></div>
+        <div class="kpi amber"><div class="kpi-lbl">Urgentes</div><div class="kpi-val" id="kpi-alerts">0</div><div class="kpi-sub">requieren atención</div><div class="kpi-ico">🔴</div></div>
+      </div>
+      <div style="background:var(--aml);border:1px solid rgba(196,122,0,.2);color:#7a4d00;border-radius:10px;padding:12px 16px;font-size:13px;display:flex;gap:8px;margin-bottom:18px;">
+        ⏰ <div><strong>Recordatorio:</strong> La devolución de fianza tiene un plazo máximo de <strong>30 días hábiles</strong> desde el check-out.</div>
+      </div>
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-hdr">
+          <div class="card-title">📋 Actividad del equipo hoy</div>
+          <button class="btn btn-ghost btn-sm" onclick="goTo('registry',document.querySelector('[onclick*=registry]'))">Ver registro completo →</button>
+        </div>
+        <div class="card-body" id="dashboard-sessions">
+          <div style="text-align:center;padding:20px;color:var(--ink3);font-size:13px;">Ejecuta un proceso desde <strong>Procesos SOP</strong> para verlo aquí.</div>
+        </div>
+      </div>
+      <div class="dash-grid">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Actividad reciente</div><span style="font-size:11px;color:var(--ink3);font-family:var(--mono)">Hoy</span></div>
+          <div class="card-body">
+            <div class="act-item"><div class="act-dot g"></div><div class="act-txt"><strong>Check-in</strong> completado — Apto. C/Colón 12, 3º</div><div class="act-time">09:30</div></div>
+            <div class="act-item"><div class="act-dot o"></div><div class="act-txt"><strong>Siniestro seguro</strong> abierto — C/Ruzafa 8</div><div class="act-time">10:15</div></div>
+            <div class="act-item"><div class="act-dot b"></div><div class="act-txt"><strong>Onboarding propietario</strong> — Fase 2 iniciada</div><div class="act-time">11:00</div></div>
+            <div class="act-item"><div class="act-dot a"></div><div class="act-txt"><strong>Fianza pendiente</strong> — C/Xàtiva 22, revisar padrón</div><div class="act-time">12:30</div></div>
+            <div class="act-item"><div class="act-dot g"></div><div class="act-txt"><strong>Limpiezas</strong> confirmadas con Cleaning Solutions</div><div class="act-time">14:00</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Cumplimiento por área</div><span style="font-size:11px;color:var(--ink3)">Este mes</span></div>
+          <div class="card-body">
+            <div class="prog-row"><div class="prog-lbl"><strong>Check-in / Check-out</strong><span>96%</span></div><div class="prog-bar"><div class="prog-fill g" style="width:96%"></div></div></div>
+            <div class="prog-row"><div class="prog-lbl"><strong>Comunicación interna</strong><span>90%</span></div><div class="prog-bar"><div class="prog-fill b" style="width:90%"></div></div></div>
+            <div class="prog-row"><div class="prog-lbl"><strong>Gestión propietarios</strong><span>88%</span></div><div class="prog-bar"><div class="prog-fill o" style="width:88%"></div></div></div>
+            <div class="prog-row"><div class="prog-lbl"><strong>Limpiezas</strong><span>94%</span></div><div class="prog-bar"><div class="prog-fill g" style="width:94%"></div></div></div>
+            <div class="prog-row"><div class="prog-lbl"><strong>Devolución de fianzas</strong><span>82%</span></div><div class="prog-bar"><div class="prog-fill o" style="width:82%"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROCESSES -->
+    <div class="view" id="view-processes">
+      <div class="filter-bar">
+        <div class="fchip active" onclick="filterP(this,'all')">Todos</div>
+        <div class="fchip" onclick="filterP(this,'op')">Operaciones</div>
+        <div class="fchip" onclick="filterP(this,'in')">Inquilinos</div>
+        <div class="fchip" onclick="filterP(this,'prop')">Propietarios</div>
+        <div class="fchip" onclick="filterP(this,'admin')">Administrativo</div>
+        <div class="fchip" style="border-color:var(--re);color:var(--re)" onclick="filterUrgent(this)">🔴 Urgentes</div>
+      </div>
+      <div class="proc-grid" id="proc-grid"></div>
+    </div>
+
+    <!-- EXECUTION -->
+    <div class="view" id="view-execution">
+      <button class="btn btn-ghost btn-sm" onclick="goTo('processes',document.querySelector('[onclick*=processes]'))" style="margin-bottom:18px">← Volver</button>
+      <div class="exec-wrap">
+        <div>
+          <div class="exec-hdr">
+            <div class="exec-title" id="exec-title">—</div>
+            <div class="exec-sub" id="exec-sub">—</div>
+            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap" id="exec-meta"></div>
+          </div>
+          <div id="step-list"></div>
+        </div>
+        <div>
+          <div class="s-card">
+            <div class="s-card-title">📊 Progreso</div>
+            <div class="s-card-body">
+              <div class="ring-wrap">
+                <svg class="ring-svg" width="88" height="88" viewBox="0 0 88 88">
+                  <circle class="ring-bg" cx="44" cy="44" r="36"/>
+                  <circle class="ring-fg" id="ring-fg" cx="44" cy="44" r="36" stroke-dasharray="226.19" stroke-dashoffset="226.19"/>
+                </svg>
+                <div class="ring-pct" id="ring-pct">0%</div>
+                <div class="ring-sub" id="ring-sub">0 de 0 ítems</div>
+              </div>
+            </div>
+          </div>
+          <div class="s-card">
+            <div class="s-card-title">✦ Asistente</div>
+            <div class="s-card-body">
+              <div class="mini-ai-msgs" id="exec-ai-msgs">
+                <div class="mai bot">¿Tienes alguna duda sobre este proceso? 👋</div>
+              </div>
+              <div class="ai-row">
+                <input class="ai-in" id="exec-ai-in" placeholder="Pregunta..." onkeydown="if(event.key==='Enter')execAiSend()">
+                <button class="ai-btn" onclick="execAiSend()">↑</button>
+              </div>
+            </div>
+          </div>
+          <div class="s-card">
+            <div class="s-card-title">👤 Responsable</div>
+            <div class="s-card-body" id="exec-resp-body">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REGISTRY -->
+    <div class="view" id="view-registry">
+      <div style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm">📥 Exportar</button>
+        <button class="btn btn-ghost btn-sm">🗓 Filtrar</button>
+      </div>
+      <table class="tbl">
+        <thead><tr><th>Proceso</th><th>Responsable</th><th>Contexto</th><th>Fecha</th><th>Estado</th><th>Progreso</th></tr></thead>
+        <tbody id="reg-body"></tbody>
+      </table>
+    </div>
+
+    <!-- ASSISTANT -->
+    <div class="view" id="view-assistant">
+      <div class="chat-layout">
+        <div class="chat-main">
+          <div class="chat-msgs" id="chat-msgs">
+            <div class="cmsg b"><div class="cavatar">✦</div><div class="cbubble">Hola, soy el asistente de <strong>EasyRent Valencia</strong>. Conozco todos vuestros SOPs en detalle. Pregúntame cualquier cosa sobre los procedimientos. 🏠</div></div>
+          </div>
+          <div class="chat-inp-area">
+            <textarea class="chat-in" id="chat-in" rows="1" placeholder="Ej: ¿Qué hago si un inquilino no entrega las llaves?" onkeydown="chatKey(event)"></textarea>
+            <button class="chat-send" onclick="chatSend()">↑</button>
+          </div>
+        </div>
+        <div class="chat-side">
+          <div class="s-card">
+            <div class="s-card-title">📋 Acceso rápido</div>
+            <div class="s-card-body" style="display:flex;flex-direction:column;gap:5px" id="chat-sop-btns"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ══ STORAGE KEYS ══
+const STORAGE_KEY = 'easyrent_sops_v1';
+const REG_KEY = 'easyrent_registry_v1';
+const SESSIONS_KEY = 'easyrent_sessions_v1';
+
+// ══ DEFAULT DATA ══
+const DEFAULT_PROCS = [
+  {id:1,emoji:'🔑',name:'Check-in de Inquilino',tag:'op',tagLabel:'Operaciones',desc:'Proceso completo de entrada: pre-check-in, verificación de pagos, entrega de llaves y documentación.',resp:'Tatiana + Yesica',dur:'Variable',cat:'op',lastRun:'Hoy 09:30',stepData:[
+    {name:'Pre-check-in (15 días antes)',time:'30 min',resp:'Tatiana',desc:'Solicitar hora de llegada. Por plataforma: Idealista (pago WISE/transferencia en el momento), Airbnb (todo por plataforma, late check-in 30€/50€), Spotahome (primer pago retenido, contrato obligatorio el día del check-in).',checks:['Solicitar fecha y hora estimada de llegada','Enviar instrucciones de pago según plataforma','Solicitar DNI/Pasaporte (obligatorio Airbnb)','Informar suplementos late check-in si aplica','Avisar a compañeros en pisos compartidos']},
+    {name:'Vídeo preventivo',time:'30 min',resp:'Cleaning Solutions',desc:'Cleaning Solutions graba vídeo del inmueble antes de la entrada: muebles, electrodomésticos, TV, colchones e inventario de ropa de cama, con fecha visible. El vídeo NO se comparte con el inquilino.',checks:['Confirmar limpieza pre-check-in con C.S.','Verificar grabación de vídeo preventivo (fecha visible)','Archivar vídeo en Google Drive','Enviar mensaje estándar al inquilino sobre inspección']},
+    {name:'Verificación de pagos',time:'15 min',resp:'Tatiana',desc:'No se entregan llaves sin confirmación de pagos. Verificar: fianza, primer mes, comisión y suministros.',checks:['Confirmar recepción de fianza','Confirmar pago del primer mes','Verificar comisión de plataforma','Registrar pagos en sistema']},
+    {name:'Entrega de llaves',time:'30 min',resp:'Yesica',desc:'Entrega de llaves en oficina o key locker. Firma de contrato el día del check-in (obligatorio Spotahome). Recorrido por el inmueble.',checks:['Preparar juego de llaves etiquetado','Firma de contrato (Spotahome obligatorio)','Recorrido por el inmueble con el inquilino','Explicar normas de convivencia']},
+    {name:'Archivo y cierre',time:'10 min',resp:'Tatiana',desc:'Documentar el check-in en el sistema y archivar contrato firmado.',checks:['Archivar contrato firmado en Drive','Registrar fecha de entrada en calendario operativo','Confirmar check-in en plataforma','Actualizar estado del inmueble']}
+  ]},
+  {id:2,emoji:'🚪',name:'Check-out de Inquilino',tag:'op',tagLabel:'Operaciones',desc:'Proceso de salida: comunicación previa, inspección, devolución de llaves y preparación para siguiente estancia.',resp:'Tatiana + Yesica + C.S.',dur:'Variable',cat:'op',lastRun:'Ayer 11:00',stepData:[
+    {name:'Comunicación previa (10 días antes)',time:'20 min',resp:'Tatiana',desc:'Enviar email al inquilino con: fecha fin de contrato, salida antes 11h (penalización 50€), no hay checkout presencial ni devolución en efectivo, baja del padrón municipal obligatoria para recuperar fianza.',checks:['Enviar email con fecha de salida y documento de salida','Recordar salida antes de 11:00h (penalización 50€)','Informar baja del padrón municipal (obligatorio para fianza)','Coordinar limpieza post-checkout','Confirmar entrega de llaves (entre semana: oficina)']},
+    {name:'Confirmación final (48h antes)',time:'10 min',resp:'Tatiana',desc:'Confirmar horario exacto de salida y forma de entrega de llaves. Enviar listado de tareas de salida.',checks:['Confirmar hora exacta de salida','Confirmar entrega llaves (oficina L-V, en piso fin de semana)','Enviar checklist de tareas de salida al inquilino']},
+    {name:'Inspección post-salida',time:'45 min',resp:'Yesica + C.S.',desc:'Inspección completa del inmueble. Comparar con inventario de entrada y vídeo preventivo. Documentar daños.',checks:['Verificar que el inmueble está vacío','Comparar estado con inventario y vídeo de entrada','Fotografiar todos los daños o incidencias','Reportar daños y faltantes al equipo']},
+    {name:'Coordinación limpieza y cierre',time:'30 min',resp:'Tatiana',desc:'Coordinar limpieza post-checkout con Cleaning Solutions. Iniciar proceso de devolución de fianza.',checks:['Enviar planning de limpieza a Cleaning Solutions','Iniciar proceso de devolución de fianza','Actualizar estado del inmueble a disponible','Archivar toda la documentación del inquilino']}
+  ]},
+  {id:3,emoji:'💶',name:'Devolución de Fianza',tag:'admin',tagLabel:'Administrativo',desc:'Cálculo objetivo de deducciones y devolución dentro del plazo legal (30 días hábiles).',resp:'Tatiana + Gestor',dur:'Hasta 30 días',cat:'admin',lastRun:'Hace 3 días',stepData:[
+    {name:'Recopilación de evidencias',time:'30 min',resp:'Yesica / C.S.',desc:'Recopilar fotografías y vídeos del estado del inmueble tras el checkout. Comparar con inventario de entrada.',checks:['Recopilar fotos y vídeos post-checkout','Cargar evidencias en carpeta Drive','Comparar con inventario y vídeo de entrada','Identificar daños, faltantes y estado de limpieza']},
+    {name:'Análisis y cálculo de deducciones',time:'20 min',resp:'Tatiana',desc:'Usar IA para pre-analizar material gráfico. Tarifas: habitación 50€ / piso 1-2hab 150€ / 3-4hab 200€. Calcular deducciones adicionales justificadas.',checks:['Analizar evidencias con herramienta IA','Aplicar tarifa de limpieza según tipo de inmueble','Calcular deducciones por daños con justificación','Toda deducción debe tener evidencia gráfica','Preparar desglose detallado para el inquilino']},
+    {name:'Comunicación al inquilino',time:'15 min',resp:'Tatiana',desc:'Enviar desglose detallado de deducciones con evidencias fotográficas.',checks:['Enviar desglose de deducciones con evidencias','Comunicar importe a devolver y plazo','Solicitar confirmación del IBAN']},
+    {name:'Transferencia y cierre',time:'10 min',resp:'Tatiana',desc:'Realizar la transferencia dentro del plazo de 30 días hábiles desde el checkout.',checks:['Realizar transferencia (menos deducciones)','Verificar comisiones transferencias internacionales (cargo inquilino)','Archivar documentación completa','Cerrar expediente del inquilino']}
+  ]},
+  {id:4,emoji:'🛡',name:'Siniestro Seguro del Hogar',tag:'op',tagLabel:'Operaciones',desc:'Apertura de parte, seguimiento y resolución. Regla: siempre abrir parte, nunca diagnosticar el origen.',resp:'Operaciones',dur:'Variable',cat:'op',lastRun:'Hoy 10:15',stepData:[
+    {name:'Apertura del parte',time:'15 min',resp:'Operaciones',desc:'Llamar siempre por teléfono al seguro. Frase: "Hay una mancha de agua / filtración / goteo — no sé de dónde viene." NUNCA decir: "viene del vecino", "es humedad", "es antiguo".',checks:['Llamar al seguro por teléfono','Usar frase estándar sin diagnóstico técnico','Anotar número de siniestro','Avisar al vecino afectado (que abra parte con su compañía)']},
+    {name:'Solicitar información y seguimiento',time:'10 min',resp:'Operaciones',desc:'Registrar número de siniestro, nombre del reparador asignado y fecha estimada de visita.',checks:['Registrar nº de siniestro','Obtener nombre y teléfono de la empresa reparadora','Obtener fecha estimada de visita','Informar al inquilino y/o propietario']},
+    {name:'Coordinación de la reparación',time:'Variable',resp:'Yesica',desc:'Facilitar acceso al inmueble. Verificar que se atiende tanto el origen como los daños derivados.',checks:['Coordinar acceso con inquilino o llaves EasyRent','Verificar actuación sobre origen Y daños (pintura, techos...)','Fotografiar antes y después de la reparación']},
+    {name:'Cierre y comunicación',time:'20 min',resp:'Operaciones',desc:'Confirmar reparación satisfactoria. Archivar expediente. Comunicar al propietario si es grave o costoso.',checks:['Confirmar satisfacción de la reparación','Archivar nº de expediente','Solicitar factura o finiquito del seguro','Comunicar al propietario solo si es grave/costoso']}
+  ]},
+  {id:5,emoji:'📑',name:'Seguro de Impago (SEAG)',tag:'admin',tagLabel:'Administrativo',desc:'Solicitud, gestión y activación del seguro de impago a través de la plataforma SEAG.',resp:'Gestora Administrativa',dur:'2-5 días',cat:'admin',lastRun:'Hace 1 semana',stepData:[
+    {name:'Scoring (Pre-aprobación)',time:'30 min',resp:'Gestora Admin',desc:'SEAG > SCORING > declaración de responsabilidad > Garantía Indefinida > rellenar datos arrendamiento e inquilinos > pre-aprobación automática.',checks:['Acceder a plataforma SEAG','Ir a sección SCORING','Marcar declaración de responsabilidad','Seleccionar Garantía Indefinida','Rellenar datos arrendamiento e inquilinos','Obtener pre-aprobación automática']},
+    {name:'Verificación de documentación',time:'45 min',resp:'Gestora Admin',desc:'Empleado: 3 nóminas + contrato + extractos + DNI. Autónomo: declaración IRPF/IVA + extractos + DNI. OBLIGATORIO verificar con ChatGPT-4 o Gemini Advanced antes de subir.',checks:['Recopilar documentación según perfil del inquilino','Verificar autenticidad con IA (ChatGPT-4 o Gemini)','Confirmar que no hay indicios de falsificación','Archivar documentación verificada']},
+    {name:'Subida y notificación a Laura',time:'15 min',resp:'Gestora Admin',desc:'SEAG > ESTUDIOS > Subir Doc. Copiar nº de estudio. WhatsApp a Laura SEAG (+34 657 300 303): indicar nº estudio + EasyRent (compañeras de Erik) + documentación subida.',checks:['Subir documentación en SEAG > ESTUDIOS','Copiar número de estudio','WhatsApp a Laura SEAG (+34 657 300 303)','Indicar nº estudio + que somos EasyRent + doc subida']},
+    {name:'Activación Express',time:'30 min',resp:'Gestora Admin',desc:'Esperar confirmación de Laura. Clic en icono Express. Rellenar: nombres, teléfonos, dirección, IBAN propietario (verificar que es el correcto). Actualizar > descargar PDF > verificar en 2 páginas > enviar a firmar digitalmente.',checks:['Esperar confirmación de Laura SEAG','Clic en icono Express','Rellenar datos (nombres, teléfonos, dirección, IBAN propietario)','Descargar PDF y verificar datos en ambas páginas','Enviar a firmar digitalmente a todas las partes']},
+    {name:'Tramitación y cierre',time:'15 min',resp:'Gestora Admin',desc:'Subir solicitud firmada + contrato + inventario. Confirmar SÍ. TRAMITAR. Informar al propietario.',checks:['Subir solicitud firmada + contrato + inventario','Confirmar SÍ que está firmada y tramitar','Informar al propietario: seguro activo, SEAG cobrará próximamente']}
+  ]},
+  {id:6,emoji:'🤝',name:'Onboarding de Propietario',tag:'prop',tagLabel:'Propietario',desc:'Integración de nuevo propietario desde formalización legal hasta lanzamiento al mercado.',resp:'Tatiana + Erik/Celina',dur:'1-2 semanas',cat:'prop',lastRun:'Ayer 11:00',stepData:[
+    {name:'Formalización legal',time:'2-3 días',resp:'Tatiana',desc:'Verificar foto WhatsApp Tatiana. Enviar email documentación + notificar por WhatsApp. Auditar docs. Redactar contrato. Incluir aviso NRUA.',checks:['Verificar foto profesional en WhatsApp de Tatiana','Enviar email documentación requerida','Notificar envío por WhatsApp','Recibir y auditar documentación completa','Archivar en Drive','Redactar contrato de gestión','Enviar contrato para firma con aviso NRUA']},
+    {name:'Auditoría del activo (Fit to Rent)',time:'1-2 días',resp:'Yesica + Erik',desc:'Logística de llaves (juegos completos, llavero EasyRent). Inspección de inventario técnico. Visita Fit to Rent. Inventario fotográfico.',checks:['Asegurar juegos de llaves y etiquetarlos','Inspección de inventario técnico','Visita Fit to Rent con Erik o Yesica','Informe: Todo Perfecto / Mejoras / Faltantes','Realizar inventario fotográfico completo']},
+    {name:'Comunicación y expectativas',time:'1 día',resp:'Tatiana',desc:'Enviar canales oficiales (info@easyrent.es / gestion@easyrent.es). Network Effects. Catálogo de servicios adicionales. Email de bienvenida.',checks:['Enviar email con canales de comunicación oficiales','Enviar mensaje Network Effects (referidos)','Enviar catálogo de servicios adicionales','Enviar email de bienvenida motivacional']},
+    {name:'Lanzamiento al mercado',time:'1-3 días',resp:'Erik/Celina + Tatiana',desc:'Sesión fotográfica profesional. Enviar selección de fotos al propietario. Publicar anuncio con copywriting de alto impacto.',checks:['Coordinar sesión fotográfica profesional','Control de calidad de fotos recibidas','Enviar selección de fotos al propietario','Publicar anuncio con copywriting de alto impacto','Compartir link del anuncio con propietario']},
+    {name:'Cierre de onboarding',time:'1 día',resp:'Tatiana',desc:'Confirmar alta en sistema. Reportar primer flujo de interesados.',checks:['Confirmar alta en sistema de gestión','Reportar primer flujo de interesados al propietario','Cerrar checklist de onboarding completo']}
+  ]},
+  {id:7,emoji:'🧹',name:'Coordinación de Limpiezas',tag:'op',tagLabel:'Operaciones',desc:'Planificación semanal con Cleaning Solutions, ropa de cama y reporte de incidencias.',resp:'Tatiana (Admin)',dur:'Semanal',cat:'op',lastRun:'Hoy 14:00',stepData:[
+    {name:'Planificación semanal (viernes)',time:'30 min',resp:'Tatiana',desc:'Enviar a Cleaning Solutions el Google Sheet actualizado. Confirmar stock de ropa de cama con 1 semana de antelación.',checks:['Actualizar Google Sheet semanal de limpiezas','Incluir: inmueble, fecha/hora, tipo, nº camas, sábanas S/N','Enviar Sheet a Cleaning Solutions por WhatsApp grupo','Confirmar stock de ropa de cama disponible']},
+    {name:'Gestión ropa de cama por plataforma',time:'15 min',resp:'Tatiana',desc:'Idealista/Spotahome: NO sábanas/toallas/edredones — SÍ almohadas+protector. Airbnb: según acuerdo del inmueble. Reflejar siempre en anuncios.',checks:['Idealista/Spotahome: confirmar sin sábanas (sí almohadas + protector)','Airbnb: revisar acuerdo específico del inmueble','Asegurar que está reflejado en el anuncio y en la reserva']},
+    {name:'Seguimiento y reporte',time:'15 min',resp:'Tatiana + C.S.',desc:'C.S. reporta daños, faltantes y anomalías. Si hay checkout, comparar con inventario para posibles descuentos de fianza.',checks:['Recibir reporte de incidencias de Cleaning Solutions','Registrar daños o faltantes en sistema','Comunicar incidencias al equipo']}
+  ]},
+  {id:8,emoji:'🏘',name:'Gestión de Propietarios',tag:'prop',tagLabel:'Propietario',desc:'Protocolo de comunicación y gestión de incidencias con propietarios activos.',resp:'Tatiana + Operaciones',dur:'Continuo',cat:'prop',lastRun:'Ayer 16:00',stepData:[
+    {name:'Protocolo de comunicación',time:'Ongoing',resp:'Todo el equipo',desc:'Email (preferente, SLA 24h): facturas, informes, contratos. WhatsApp 10-19h L-V: consultas rápidas. Teléfono: confirmar por email siempre.',checks:['Email para documentación formal (SLA 24h)','WhatsApp solo 10-19h L-V','Confirmar por email toda decisión telefónica','WhatsApp/llamada fuera de horario solo para emergencias']},
+    {name:'Gestión de incidencias',time:'Variable',resp:'Yesica + Tatiana',desc:'URGENTE: inmediato. POCO URGENTE: 24-48h. NO URGENTE: programado. Filtro seguro siempre. >50€ presupuesto previo. >200€ aprobación propietario.',checks:['Clasificar urgencia (URGENTE / POCO URGENTE / NO URGENTE)','Filtro seguro: si hay cobertura, gestionar por seguro','Si >50€: obtener presupuesto previo','Si >200€: notificar propietario y esperar aprobación','Coordinar con Administrador de Fincas si es elemento común']},
+    {name:'Resolución y cierre',time:'30 min',resp:'Tatiana',desc:'Verificar satisfacción. Solicitar factura. Comunicar al propietario solo si es grave o costoso.',checks:['Confirmar satisfacción de la reparación','Solicitar factura detallada','Archivar nº expediente si fue por seguro','Comunicar al propietario solo si es grave/costoso']}
+  ]},
+  {id:9,emoji:'💬',name:'Comunicación Interna',tag:'admin',tagLabel:'Administrativo',desc:'Google Chat Spaces y regla 70-20-10 para gestionar la comunicación del equipo.',resp:'Todo el equipo',dur:'Diario',cat:'admin',lastRun:'Hoy',stepData:[
+    {name:'Clasificar antes de comunicar',time:'1 min',resp:'Todo el equipo',desc:'INFORMACIÓN → no escala. TAREA → no escala. PROBLEMA → solo si no puedes resolverlo. DECISIÓN → siempre a Erik/Celina.',checks:['¿Es información o tarea? → Gestionar sin escalar','¿Es un problema? → ¿Puedo resolverlo yo?','¿Es decisión estratégica/financiera? → Escalar a Erik/Celina']},
+    {name:'Usar el Space correcto',time:'1 min',resp:'Todo el equipo',desc:'Space 01 Operativa Diaria: check-ins/outs, agenda. Space 02 Incidencias Mantenimiento: reparaciones.',checks:['Check-in/out → Space 01 Operativa Diaria','Incidencia técnica → Space 02 Incidencias Mantenimiento','No mezclar canales']},
+    {name:'Documentar comunicaciones relevantes',time:'5 min',resp:'Todo el equipo',desc:'Toda decisión por teléfono se confirma por email. Archivar en Drive si es relevante.',checks:['Confirmar por email toda decisión telefónica','Documentar incidencias en el Space correspondiente','Archivar en Drive si es documentación relevante']}
+  ]},
+  {id:10,emoji:'👤',name:'Filtrado de Inquilinos',tag:'in',tagLabel:'Inquilinos',desc:'Criterios de aceptación/rechazo y protocolo de llamadas en Idealista.',resp:'Gestora Administrativa',dur:'Variable',cat:'in',lastRun:'Hoy 09:00',stepData:[
+    {name:'Filtrado inicial de candidatos',time:'10 min',resp:'Tatiana',desc:'ACEPTAR: educado, ingresos 3x alquiler, 20-48 años, sin menores (habitaciones), estancia +3 meses. DESCARTAR: defensivo ante preguntas, ingresos insuficientes, menor de 20 o mayor de 48 años.',checks:['Verificar actitud y comunicación clara','Confirmar ingresos mínimos 3x el alquiler','Rango de edad 20-48 años','Estancia mínima de 3 meses','Sin menores a cargo (pisos compartidos por habitaciones)']},
+    {name:'Llamada de filtro',time:'15 min',resp:'Tatiana',desc:'Preguntar con naturalidad: situación laboral, ingresos, motivo del cambio. El perfil bueno comparte info con naturalidad. El perfil malo se ofende ante preguntas incómodas.',checks:['Preguntar situación laboral y nivel de ingresos','Preguntar motivo del cambio de vivienda','Verificar que responde con naturalidad, sin defensividad','Si pasa el filtro: concertar visita']},
+    {name:'Gestión de incidencias con inquilinos',time:'Variable',resp:'Tatiana + Yesica',desc:'Comunicaciones por canales acordados. Incidencias de convivencia: escalar si no se resuelven. Impagos: activar SEAG si aplica.',checks:['Mantener comunicación por canales acordados','Incidencia convivencia: aviso formal primero','Si no se resuelve: escalar y documentar todo','Impago: revisar si hay seguro SEAG activo']}
+  ]},
+  {id:11,emoji:'🛏',name:'Limpieza Habitaciones (Pisos Compartidos)',tag:'op',tagLabel:'Operaciones',desc:'Supervisión de limpiezas en pisos compartidos y check-out de habitaciones individuales.',resp:'Gestora Admin + C.S.',dur:'Por checkout',cat:'op',lastRun:'Ayer 15:00',stepData:[
+    {name:'Supervisión general en cada visita',time:'20 min',resp:'C.S. + Tatiana',desc:'Verificar estado general, comprobar cumplimiento de inquilinos, revisar stock de productos, tirar basura. Si no se reporta, se considera no realizado.',checks:['Verificar estado general de limpieza','Comprobar cumplimiento de limpieza por inquilinos','Revisar stock de productos de limpieza','Tirar basura (plástico, cartón, general, orgánica)','Reportar cualquier incidencia o anomalía']},
+    {name:'Check-out de habitación (día 15 o 31)',time:'45 min',resp:'Cleaning Solutions',desc:'Verificar habitación vacía. Revisar colchón, muebles, paredes, manchas, daños, ropa de cama. Vaciar y limpiar armarios. NUNCA asumir que "ya estaba así".',checks:['Verificar que habitación está completamente vacía','Revisar: colchón, muebles, paredes, manchas, daños y ropa de cama','Vaciar y limpiar armarios completos','Limpiar baldas asignadas en nevera y cocina','Verificar inventario de la habitación','Reportar faltantes, daños y anomalías inmediatamente']},
+    {name:'Zonas comunes y restricciones',time:'30 min',resp:'Cleaning Solutions',desc:'En días sin checkout: priorizar zonas comunes. NO lavar platos ni ropa personal. SÍ lavar protectores de colchón, alfombrillas, cortinas de baño.',checks:['Limpiar zonas comunes (sin checkout: prioridad)','NO lavar platos ni ropa personal de inquilinos','SÍ lavar: protectores colchón, alfombrillas, cortinas baño','No manipular objetos personales de inquilinos']}
+  ]}
+];
+
+const DEFAULT_REGISTRY = [
+  {proc:'Check-in de Inquilino',resp:'Tatiana',ctx:'C/Colón 12, 3º',date:'Hoy 09:30',status:'done',pct:100},
+  {proc:'Siniestro Seguro Hogar',resp:'Operaciones',ctx:'C/Ruzafa 8',date:'Hoy 10:15',status:'prog',pct:50},
+  {proc:'Onboarding Propietario',resp:'Tatiana',ctx:'Nuevo propietario',date:'Hoy 11:00',status:'prog',pct:40},
+  {proc:'Devolución de Fianza',resp:'Tatiana',ctx:'C/Xàtiva 22',date:'Ayer 16:00',status:'pend',pct:20},
+  {proc:'Coordinación Limpiezas',resp:'Tatiana',ctx:'Planificación semanal',date:'Hoy 14:00',status:'done',pct:100},
+  {proc:'Check-out de Inquilino',resp:'Yesica',ctx:'Avda. Aragón 5',date:'Ayer 11:00',status:'done',pct:100},
+];
+
+// ══ STATE ══
+let PROCS = loadProcs();
+let SESSIONS = loadSessions(); // active in-progress sessions
+let curProc = null, curStep = 0, stepChecks = [];
+let editingId = null;
+let deletingId = null;
+let curFilter = 'all';
+
+function loadProcs() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(DEFAULT_PROCS));
+}
+
+function saveProcsToStorage() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(PROCS)); } catch(e) {}
+}
+
+function loadSessions() {
+  try {
+    const saved = localStorage.getItem(SESSIONS_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return {};
+}
+
+function saveSession() {
+  if (!curProc) return;
+  const total = curProc.stepData.reduce((a,s) => a + s.checks.length, 0);
+  const done = stepChecks.flat().filter(Boolean).length;
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  SESSIONS[curProc.id] = {
+    procId: curProc.id,
+    procName: curProc.name,
+    procEmoji: curProc.emoji,
+    curStep,
+    stepChecks,
+    pct,
+    startedAt: SESSIONS[curProc.id]?.startedAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    status: pct === 100 ? 'done' : 'prog'
+  };
+  try { localStorage.setItem(SESSIONS_KEY, JSON.stringify(SESSIONS)); } catch(e) {}
+}
+
+function completeSession() {
+  if (!curProc) return;
+  SESSIONS[curProc.id] = {
+    ...SESSIONS[curProc.id],
+    pct: 100,
+    status: 'done',
+    completedAt: new Date().toISOString()
+  };
+  try { localStorage.setItem(SESSIONS_KEY, JSON.stringify(SESSIONS)); } catch(e) {}
+}
+
+function clearSession(procId) {
+  delete SESSIONS[procId];
+  try { localStorage.setItem(SESSIONS_KEY, JSON.stringify(SESSIONS)); } catch(e) {}
+}
+
+function getActiveSession(procId) {
+  return SESSIONS[procId] || null;
+}
+
+function formatSessionTime(isoString) {
+  if (!isoString) return '—';
+  const d = new Date(isoString);
+  const now = new Date();
+  const diffMs = now - d;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffMins < 1) return 'Ahora mismo';
+  if (diffMins < 60) return `Hace ${diffMins} min`;
+  if (diffHours < 24) return `Hace ${diffHours}h`;
+  return `Hace ${diffDays}d`;
+}
+
+// ══ NAV ══
+function goTo(view, el) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  if (el) el.classList.add('active');
+  const titles = {dashboard:'Dashboard',processes:'Procesos SOP',execution:'Ejecución',registry:'Registro',assistant:'Asistente IA'};
+  document.getElementById('topbar-title').textContent = titles[view]||view;
+  closeNav();
+}
+function openNav(){document.getElementById('nav').classList.add('open');document.getElementById('overlay').classList.add('show');}
+function closeNav(){document.getElementById('nav').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+
+// ══ URGENCY ══
+const URGENCY_KEY = 'easyrent_urgency_v1';
+let URGENCY = loadUrgency();
+
+function loadUrgency() {
+  try { const s = localStorage.getItem(URGENCY_KEY); if(s) return JSON.parse(s); } catch(e){}
+  return {};
+}
+function saveUrgency() {
+  try { localStorage.setItem(URGENCY_KEY, JSON.stringify(URGENCY)); } catch(e){}
+}
+function cycleUrgency(id, e) {
+  e.stopPropagation();
+  const cur = URGENCY[id] || 'normal';
+  const next = cur === 'normal' ? 'urgent' : cur === 'urgent' ? 'high' : 'normal';
+  URGENCY[id] = next;
+  saveUrgency();
+  renderProcs();
+  renderDashboardSessions();
+}
+function getUrgencyLabel(level) {
+  if (level === 'urgent') return '🔴 Urgente';
+  if (level === 'high') return '🟡 Alta';
+  return '⚪ Normal';
+}
+
+// ══ PROCESSES RENDER ══
+const CAT_MAP = {op:{label:'Operaciones',cls:'tag-op'},in:{label:'Inquilinos',cls:'tag-in'},prop:{label:'Propietario',cls:'tag-prop'},admin:{label:'Administrativo',cls:'tag-admin'}};
+
+function renderProcs(filter) {
+  if (filter !== undefined) curFilter = filter;
+  const grid = document.getElementById('proc-grid');
+
+  // Sort: urgent first, then high, then normal
+  let list = curFilter === 'all' ? [...PROCS] : PROCS.filter(p => p.cat === curFilter);
+  list.sort((a,b) => {
+    const order = {urgent:0, high:1, normal:2};
+    return (order[URGENCY[a.id]||'normal']) - (order[URGENCY[b.id]||'normal']);
+  });
+
+  document.getElementById('nb-p').textContent = PROCS.length;
+  document.getElementById('kpi-sops').textContent = PROCS.length;
+
+  // update urgent KPI
+  const urgentCount = Object.values(URGENCY).filter(v => v === 'urgent').length;
+  const kpiAlerts = document.getElementById('kpi-alerts');
+  if (kpiAlerts) kpiAlerts.textContent = urgentCount || 2;
+
+  if (list.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink3);font-size:14px;">No hay SOPs en esta categoría. <button class="btn btn-primary btn-sm" onclick="openNewProcModal()" style="margin-left:8px">+ Crear SOP</button></div>`;
+    return;
+  }
+  grid.innerHTML = list.map(p => {
+    const cat = CAT_MAP[p.cat] || CAT_MAP.op;
+    const session = getActiveSession(p.id);
+    const hasSession = session && session.status === 'prog';
+    const urgency = URGENCY[p.id] || 'normal';
+    const isUrgent = urgency === 'urgent';
+    const isHigh = urgency === 'high';
+    return `
+    <div class="proc-card ${isUrgent?'urgent':''}">
+      ${isUrgent ? '<div class="urgency-bar urgent"></div>' : isHigh ? '<div class="urgency-bar high"></div>' : ''}
+      <div class="pc-top" style="margin-top:${isUrgent||isHigh?'6px':'0'}">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="pc-emoji">${p.emoji}</div>
+          ${isUrgent ? '<span class="urgency-badge urgent">🔴 Urgente</span>' : isHigh ? '<span class="urgency-badge high">🟡 Alta prioridad</span>' : ''}
+        </div>
+        <div class="pc-actions" style="gap:5px">
+          <button class="urgency-btn" onclick="cycleUrgency(${p.id},event)" title="Cambiar prioridad: ${getUrgencyLabel(urgency)}">${isUrgent?'🔴':isHigh?'🟡':'⚪'}</button>
+          <div class="tag ${cat.cls}">${cat.label}</div>
+        </div>
+      </div>
+      <div class="pc-name">${p.name}</div>
+      <div class="pc-desc">${p.desc}</div>
+      <div class="pc-meta"><span>📋 ${p.stepData.length} pasos</span><span>⏱ ${p.dur}</span><span>👤 ${p.resp}</span></div>
+      ${hasSession ? `<div style="margin-top:10px;padding:8px 10px;background:var(--bll);border-radius:8px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:12px;color:var(--bl);font-weight:600">● En curso — ${session.pct}%</div>
+        <div class="prog-bar" style="width:80px;height:4px"><div class="prog-fill b" style="width:${session.pct}%"></div></div>
+      </div>` : ''}
+      <div class="pc-footer">
+        <div style="display:flex;gap:5px">
+          <button class="btn btn-ghost btn-sm" onclick="openEditModal(${p.id})">✏️ Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="askDelete(${p.id})">🗑</button>
+        </div>
+        <div style="display:flex;gap:5px">
+          ${hasSession ? `<button class="btn btn-ghost btn-sm" onclick="clearSession(${p.id});renderProcs()">✕</button>` : ''}
+          <button class="btn btn-primary btn-sm" onclick="startProc(${p.id})">${hasSession ? 'Continuar →' : 'Ejecutar →'}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Update chat sidebar buttons
+  const chatBtns = document.getElementById('chat-sop-btns');
+  if (chatBtns) {
+    chatBtns.innerHTML = PROCS.map(p => `<button class="sop-btn" onclick="chatQuick('¿Cómo ejecuto el proceso: ${p.name}?')">${p.emoji} ${p.name}</button>`).join('');
+  }
+}
+
+function filterP(el, cat) {
+  document.querySelectorAll('.fchip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderProcs(cat);
+}
+
+function filterUrgent(el) {
+  document.querySelectorAll('.fchip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  el.style.background = 'var(--re)';
+  el.style.color = '#fff';
+  el.style.borderColor = 'var(--re)';
+  const grid = document.getElementById('proc-grid');
+  const urgent = PROCS.filter(p => URGENCY[p.id] === 'urgent' || URGENCY[p.id] === 'high');
+  if (urgent.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink3);font-size:14px;">No hay procesos marcados como urgentes.<br><span style="font-size:12px">Haz clic en ⚪ en cualquier tarjeta para marcarla como urgente.</span></div>`;
+    return;
+  }
+  // render only urgent/high sorted
+  const saved = curFilter;
+  curFilter = 'all';
+  const allProcs = PROCS;
+  // temporarily filter to urgent only
+  const tempProcs = PROCS.filter(p => URGENCY[p.id] === 'urgent' || URGENCY[p.id] === 'high');
+  const savedProcs = PROCS;
+  grid.innerHTML = tempProcs.sort((a,b) => {
+    const order = {urgent:0, high:1};
+    return (order[URGENCY[a.id]]||1) - (order[URGENCY[b.id]]||1);
+  }).map(p => {
+    const cat = CAT_MAP[p.cat] || CAT_MAP.op;
+    const session = getActiveSession(p.id);
+    const hasSession = session && session.status === 'prog';
+    const urgency = URGENCY[p.id] || 'normal';
+    const isUrgent = urgency === 'urgent';
+    return `
+    <div class="proc-card ${isUrgent?'urgent':''}">
+      ${isUrgent ? '<div class="urgency-bar urgent"></div>' : '<div class="urgency-bar high"></div>'}
+      <div class="pc-top" style="margin-top:6px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="pc-emoji">${p.emoji}</div>
+          <span class="urgency-badge ${isUrgent?'urgent':'high'}">${isUrgent?'🔴 Urgente':'🟡 Alta prioridad'}</span>
+        </div>
+        <div class="pc-actions" style="gap:5px">
+          <button class="urgency-btn" onclick="cycleUrgency(${p.id},event)" title="Cambiar prioridad">${isUrgent?'🔴':'🟡'}</button>
+          <div class="tag ${cat.cls}">${cat.label}</div>
+        </div>
+      </div>
+      <div class="pc-name">${p.name}</div>
+      <div class="pc-desc">${p.desc}</div>
+      <div class="pc-meta"><span>📋 ${p.stepData.length} pasos</span><span>⏱ ${p.dur}</span></div>
+      <div class="pc-footer">
+        <div style="display:flex;gap:5px">
+          <button class="btn btn-ghost btn-sm" onclick="openEditModal(${p.id})">✏️ Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="askDelete(${p.id})">🗑</button>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="startProc(${p.id})">${hasSession?'Continuar →':'Ejecutar →'}</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('nb-p').textContent = PROCS.length;
+}
+
+// ══ EDITOR MODAL ══
+function openNewProcModal() {
+  editingId = null;
+  document.getElementById('edit-modal-title').textContent = '+ Nuevo SOP';
+  document.getElementById('edit-name').value = '';
+  document.getElementById('edit-emoji').value = '📋';
+  document.getElementById('edit-cat').value = 'op';
+  document.getElementById('edit-resp').value = '';
+  document.getElementById('edit-dur').value = '';
+  document.getElementById('edit-desc').value = '';
+  renderStepsEditor([]);
+  document.getElementById('editModal').classList.add('show');
+}
+
+function openEditModal(id) {
+  const p = PROCS.find(x => x.id === id);
+  if (!p) return;
+  editingId = id;
+  document.getElementById('edit-modal-title').textContent = 'Editar SOP';
+  document.getElementById('edit-name').value = p.name;
+  document.getElementById('edit-emoji').value = p.emoji;
+  document.getElementById('edit-cat').value = p.cat;
+  document.getElementById('edit-resp').value = p.resp;
+  document.getElementById('edit-dur').value = p.dur;
+  document.getElementById('edit-desc').value = p.desc;
+  renderStepsEditor(p.stepData);
+  document.getElementById('editModal').classList.add('show');
+}
+
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('show');
+  editingId = null;
+}
+
+function renderStepsEditor(steps) {
+  const container = document.getElementById('steps-editor');
+  document.getElementById('steps-count').textContent = steps.length + ' paso' + (steps.length !== 1 ? 's' : '');
+  container.innerHTML = steps.map((s, i) => `
+    <div class="step-editor" id="se-${i}">
+      <div class="step-editor-hdr">
+        <div class="step-num-badge">${i+1}</div>
+        <div class="step-editor-title">Paso ${i+1}</div>
+        <button class="step-remove-btn" onclick="removeStep(${i})" title="Eliminar paso">🗑</button>
+      </div>
+      <div class="form-row" style="margin-bottom:8px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Nombre del paso</label>
+          <input class="form-input" id="sn-${i}" value="${escHtml(s.name)}" placeholder="Ej: Verificación de pagos">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Duración</label>
+          <input class="form-input" id="st-${i}" value="${escHtml(s.time)}" placeholder="Ej: 15 min">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:8px">
+        <label class="form-label">Responsable</label>
+        <input class="form-input" id="sr-${i}" value="${escHtml(s.resp||'')}" placeholder="Ej: Tatiana">
+      </div>
+      <div class="form-group" style="margin-bottom:8px">
+        <label class="form-label">Descripción / instrucciones</label>
+        <textarea class="form-textarea" id="sd-${i}" style="min-height:60px">${escHtml(s.desc)}</textarea>
+      </div>
+      <div>
+        <label class="form-label">Checklist de ítems</label>
+        <div class="checks-editor" id="checks-${i}">
+          ${s.checks.map((c, ci) => `
+            <div class="check-edit-row" id="cr-${i}-${ci}">
+              <input class="check-edit-input" id="ci-${i}-${ci}" value="${escHtml(c)}" placeholder="Ítem del checklist">
+              <button class="check-remove" onclick="removeCheck(${i},${ci})">✕</button>
+            </div>`).join('')}
+        </div>
+        <button class="add-check-btn" onclick="addCheck(${i})">+ Añadir ítem</button>
+      </div>
+    </div>`).join('');
+}
+
+function addStep() {
+  const current = collectStepsFromEditor();
+  current.push({name:'Nuevo paso',time:'',resp:'',desc:'',checks:[]});
+  renderStepsEditor(current);
+  setTimeout(() => {
+    const last = document.querySelector('.step-editor:last-of-type');
+    if (last) last.scrollIntoView({behavior:'smooth',block:'center'});
+  }, 50);
+}
+
+function removeStep(i) {
+  const current = collectStepsFromEditor();
+  current.splice(i, 1);
+  renderStepsEditor(current);
+}
+
+function addCheck(stepIdx) {
+  const container = document.getElementById('checks-' + stepIdx);
+  const ci = container.children.length;
+  const div = document.createElement('div');
+  div.className = 'check-edit-row';
+  div.id = `cr-${stepIdx}-${ci}`;
+  div.innerHTML = `<input class="check-edit-input" id="ci-${stepIdx}-${ci}" placeholder="Nuevo ítem"><button class="check-remove" onclick="this.parentElement.remove()">✕</button>`;
+  container.appendChild(div);
+  div.querySelector('input').focus();
+}
+
+function removeCheck(si, ci) {
+  const el = document.getElementById(`cr-${si}-${ci}`);
+  if (el) el.remove();
+}
+
+function collectStepsFromEditor() {
+  const steps = [];
+  let i = 0;
+  while (document.getElementById('se-' + i)) {
+    const checks = [];
+    let ci = 0;
+    while (true) {
+      const checkEl = document.querySelector(`#checks-${i} .check-edit-input`);
+      const allChecks = document.querySelectorAll(`#checks-${i} .check-edit-input`);
+      if (ci >= allChecks.length) break;
+      const val = allChecks[ci].value.trim();
+      if (val) checks.push(val);
+      ci++;
+    }
+    steps.push({
+      name: document.getElementById('sn-'+i)?.value.trim() || 'Paso ' + (i+1),
+      time: document.getElementById('st-'+i)?.value.trim() || '',
+      resp: document.getElementById('sr-'+i)?.value.trim() || '',
+      desc: document.getElementById('sd-'+i)?.value.trim() || '',
+      checks
+    });
+    i++;
+  }
+  return steps;
+}
+
+function saveProc() {
+  const name = document.getElementById('edit-name').value.trim();
+  if (!name) { alert('El nombre del SOP es obligatorio.'); return; }
+  const cat = document.getElementById('edit-cat').value;
+  const catLabel = CAT_MAP[cat]?.label || 'Operaciones';
+  const steps = collectStepsFromEditor();
+  if (editingId) {
+    const idx = PROCS.findIndex(p => p.id === editingId);
+    if (idx !== -1) {
+      PROCS[idx] = { ...PROCS[idx],
+        name, emoji: document.getElementById('edit-emoji').value || '📋',
+        cat, tagLabel: catLabel, tag: cat,
+        resp: document.getElementById('edit-resp').value.trim(),
+        dur: document.getElementById('edit-dur').value.trim(),
+        desc: document.getElementById('edit-desc').value.trim(),
+        stepData: steps
+      };
+    }
+  } else {
+    const newId = Math.max(0, ...PROCS.map(p => p.id)) + 1;
+    PROCS.push({
+      id: newId,
+      emoji: document.getElementById('edit-emoji').value || '📋',
+      name, tag: cat, tagLabel: catLabel, cat,
+      desc: document.getElementById('edit-desc').value.trim(),
+      resp: document.getElementById('edit-resp').value.trim(),
+      dur: document.getElementById('edit-dur').value.trim(),
+      lastRun: 'Nuevo', stepData: steps
+    });
+  }
+  saveProcsToStorage();
+  closeEditModal();
+  renderProcs();
+  goTo('processes', document.querySelector('[onclick*=processes]'));
+}
+
+// ══ DELETE ══
+function askDelete(id) {
+  deletingId = id;
+  document.getElementById('confirmBox').classList.add('show');
+}
+function closeConfirm() {
+  document.getElementById('confirmBox').classList.remove('show');
+  deletingId = null;
+}
+function confirmDelete() {
+  if (deletingId) {
+    PROCS = PROCS.filter(p => p.id !== deletingId);
+    saveProcsToStorage();
+    renderProcs();
+  }
+  closeConfirm();
+}
+
+// ══ EXECUTION ══
+function startProc(id) {
+  curProc = PROCS.find(p => p.id === id);
+  if (!curProc) return;
+
+  // Resume existing session if available
+  const existing = getActiveSession(id);
+  if (existing && existing.status === 'prog') {
+    curStep = existing.curStep || 0;
+    stepChecks = existing.stepChecks || curProc.stepData.map(s => new Array(s.checks.length).fill(false));
+  } else {
+    curStep = 0;
+    stepChecks = curProc.stepData.map(s => new Array(s.checks.length).fill(false));
+  }
+
+  document.getElementById('exec-title').textContent = curProc.emoji + ' ' + curProc.name;
+  document.getElementById('exec-sub').textContent = curProc.desc;
+  document.getElementById('exec-meta').innerHTML = `<span style="font-size:12px;color:var(--ink2)">👤 ${curProc.resp}</span><span style="font-size:12px;color:var(--ink2)">⏱ ${curProc.dur}</span>`;
+  document.getElementById('exec-resp-body').innerHTML = `<div style="font-size:13px;font-weight:500">${curProc.resp}</div><div style="font-size:11px;color:var(--ink3);margin-top:3px;font-family:var(--mono)">Iniciado ${new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}</div>`;
+  document.getElementById('exec-ai-msgs').innerHTML = `<div class="mai bot">Ejecutando "<strong>${curProc.name}</strong>". ¿Tienes alguna duda? 👋</div>`;
+
+  saveSession(); // register as in-progress
+  renderStepList();
+  updateRing();
+  renderDashboardSessions();
+  goTo('execution', null);
+}
+
+function renderStepList() {
+  document.getElementById('step-list').innerHTML = curProc.stepData.map((s, i) => {
+    const state = i < curStep ? 'done' : i === curStep ? 'current' : 'locked';
+    const allDone = stepChecks[i].every(Boolean);
+    const checks = s.checks.map((c, ci) => `
+      <div class="ci ${stepChecks[i][ci]?'checked':''}" onclick="toggleCheck(${i},${ci})">
+        <div class="cbox">${stepChecks[i][ci]?'✓':''}</div>${escHtml(c)}
+      </div>`).join('');
+    return `
+      <div class="step ${state}" id="step-${i}">
+        <div class="step-hdr">
+          <div class="step-num">${state==='done'?'✓':i+1}</div>
+          <div class="step-info">
+            <div class="step-name">${escHtml(s.name)}</div>
+            <div class="step-meta">⏱ ${escHtml(s.time)}${s.resp?' · 👤 '+escHtml(s.resp):''}</div>
+          </div>
+          <div style="font-size:16px">${state==='done'?'✅':state==='current'?'▶':'🔒'}</div>
+        </div>
+        <div class="step-body">
+          <div class="step-desc">${escHtml(s.desc)}</div>
+          <div class="checklist">${checks}</div>
+          <div style="display:flex;gap:8px">
+            ${allDone && i===curStep ? `<button class="btn btn-primary btn-sm" onclick="nextStep()">${i===curProc.stepData.length-1?'🏁 Completar proceso':'Siguiente paso →'}</button>` : `<button class="btn btn-ghost btn-sm" disabled style="opacity:.4">Completa todos los ítems para continuar</button>`}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleCheck(si, ci) {
+  if (si !== curStep) return;
+  stepChecks[si][ci] = !stepChecks[si][ci];
+  renderStepList();
+  updateRing();
+  saveSession();
+  renderDashboardSessions();
+}
+
+function nextStep() {
+  if (curStep < curProc.stepData.length - 1) {
+    curStep++;
+    renderStepList();
+    updateRing();
+    saveSession();
+    renderDashboardSessions();
+    document.getElementById('step-'+curStep).scrollIntoView({behavior:'smooth',block:'start'});
+  } else {
+    completeSession();
+    renderDashboardSessions();
+    renderReg();
+    alert(`✅ Proceso "${curProc.name}" completado.\n\nRegistrado en el historial de actividad.`);
+    goTo('processes', document.querySelector('[onclick*=processes]'));
+  }
+}
+
+function updateRing() {
+  const total = curProc.stepData.reduce((a,s) => a + s.checks.length, 0);
+  const done = stepChecks.flat().filter(Boolean).length;
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('ring-fg').style.strokeDashoffset = 226.19 - (pct/100)*226.19;
+  document.getElementById('ring-pct').textContent = pct+'%';
+  document.getElementById('ring-sub').textContent = done+' de '+total+' ítems';
+}
+
+// ══ EXEC AI ══
+async function execAiSend() {
+  const inp = document.getElementById('exec-ai-in');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  inp.value = '';
+  const msgs = document.getElementById('exec-ai-msgs');
+  msgs.innerHTML += `<div class="mai usr">${escHtml(txt)}</div>`;
+  msgs.innerHTML += `<div class="mai bot" id="et"><div class="thinking"><span></span><span></span><span></span></div></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+  const ctx = curProc ? `Proceso: ${curProc.name}. Paso actual: ${curProc.stepData[curStep]?.name}. Descripción: ${curProc.stepData[curStep]?.desc}` : '';
+  try {
+    const r = await fetch('/.netlify/functions/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:`Eres asistente de EasyRent Valencia. Responde en español, conciso y práctico. ${ctx}`,messages:[{role:'user',content:txt}]})});
+    const d = await r.json();
+    document.getElementById('et').outerHTML = `<div class="mai bot">${d.content?.[0]?.text||'Sin respuesta.'}</div>`;
+  } catch { document.getElementById('et').outerHTML = `<div class="mai bot">Error de conexión.</div>`; }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ══ CHAT ══
+const SOP_CTX = `EasyRent Valencia (Digirent Solutions S.L.) es una empresa de gestión de alquileres. Equipo: Erik y Celina (Dirección), Yesica (Gestora Operativa/Campo), Tatiana (Gestora Administrativa). SOPs: Check-in (por plataforma: Idealista pago WISE/transferencia, Airbnb todo en plataforma sin contrato físico late check-in 30€/50€, Spotahome contrato obligatorio primer pago retenido). Check-out (comunicar 10 días antes, salida antes 11h penalización 50€, fin de semana 70€, llaves entre semana en oficina penalización 25€+IVA si no pueden, padrón municipal obligatorio para recuperar fianza). Fianza (30 días hábiles, tarifa limpieza: habitación 50€, 1-2hab 150€, 3-4hab 200€). Seguro hogar (siempre por teléfono, frase "no sé de dónde viene", nunca diagnosticar). SEAG (Laura +34 657 300 303 WhatsApp, Garantía Indefinida, verificar docs con IA). Onboarding propietario (5 fases: legal, activo, comunicación, lanzamiento, cierre). Limpiezas (Google Sheet viernes a Cleaning Solutions, Idealista/Spotahome sin sábanas sí almohadas+protector, Airbnb según acuerdo). Comunicación interna (Google Chat Spaces, regla 70-20-10). Filtrado inquilinos (20-48 años, ingresos 3x, sin menores en habitaciones, mínimo 3 meses).`;
+
+async function chatSend() {
+  const inp = document.getElementById('chat-in');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  inp.value = '';
+  const msgs = document.getElementById('chat-msgs');
+  msgs.innerHTML += `<div class="cmsg u"><div class="cavatar">👤</div><div class="cbubble">${escHtml(txt)}</div></div>`;
+  msgs.innerHTML += `<div class="cmsg b" id="ct"><div class="cavatar">✦</div><div class="cbubble"><div class="thinking"><span></span><span></span><span></span></div></div></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+  try {
+    const r = await fetch('/.netlify/functions/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:`Eres el asistente operacional de EasyRent Valencia. Responde SIEMPRE en español. Sé preciso, práctico y directo. Incluye datos concretos (precios, plazos, contactos) cuando los tengas.\n\n${SOP_CTX}`,messages:[{role:'user',content:txt}]})});
+    const d = await r.json();
+    const reply = (d.content?.[0]?.text||'Sin respuesta.').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^(\d+)\.\s+(.+)$/gm,'<li>$2</li>').replace(/(<li>.*<\/li>\n?)+/g,m=>`<ol>${m}</ol>`).replace(/^[-•]\s+(.+)$/gm,'<li>$1</li>').replace(/(<li>.*<\/li>\n?)+/g,m=>`<ul>${m}</ul>`).replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+    document.getElementById('ct').outerHTML = `<div class="cmsg b"><div class="cavatar">✦</div><div class="cbubble">${reply}</div></div>`;
+  } catch { document.getElementById('ct').outerHTML = `<div class="cmsg b"><div class="cavatar">✦</div><div class="cbubble">Error de conexión.</div></div>`; }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function chatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();chatSend();}}
+function chatQuick(t){document.getElementById('chat-in').value=t;chatSend();}
+
+// ══ DASHBOARD SESSIONS ══
+function renderDashboardSessions() {
+  const container = document.getElementById('dashboard-sessions');
+  if (!container) return;
+  const all = Object.values(SESSIONS);
+  const active = all.filter(s => s.status === 'prog');
+  const done = all.filter(s => s.status === 'done');
+
+  // update KPIs
+  const kpiEl = document.getElementById('kpi-inprogress');
+  if (kpiEl) { kpiEl.textContent = active.length; }
+  const kpiDone = document.getElementById('kpi-done-today');
+  if (kpiDone) kpiDone.textContent = done.length;
+
+  if (all.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:20px;color:var(--ink3);font-size:13px;">Ejecuta un proceso desde <strong>Procesos SOP</strong> para verlo aquí.</div>`;
+    return;
+  }
+
+  const rows = [
+    ...active.map(s => `
+    <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="startProc(${s.procId})">
+      <div style="font-size:20px;width:28px;text-align:center;flex-shrink:0">${s.procEmoji}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600">${escHtml(s.procName)}</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:2px">Actualizado ${formatSessionTime(s.updatedAt)} · Paso ${s.curStep + 1}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+        <div style="text-align:right">
+          <div style="font-size:13px;font-weight:700;color:var(--bl)">${s.pct}%</div>
+          <div class="prog-bar" style="width:56px;height:4px;margin-top:3px"><div class="prog-fill b" style="width:${s.pct}%"></div></div>
+        </div>
+        <span style="background:var(--bll);color:var(--bl);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;">● EN CURSO</span>
+        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();startProc(${s.procId})" style="white-space:nowrap">Continuar →</button>
+      </div>
+    </div>`),
+    ...done.map(s => `
+    <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;opacity:.75;" onclick="reviewProc(${s.procId})">
+      <div style="font-size:20px;width:28px;text-align:center;flex-shrink:0">${s.procEmoji}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600">${escHtml(s.procName)}</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:2px">Completado ${formatSessionTime(s.completedAt || s.updatedAt)}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+        <span style="background:var(--grl);color:var(--gr);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;">✓ COMPLETADO</span>
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();reviewProc(${s.procId})">Ver →</button>
+      </div>
+    </div>`)
+  ];
+
+  // Show urgent SOPs alert at top of dashboard sessions
+  const urgentSOPs = PROCS.filter(p => URGENCY[p.id] === 'urgent');
+  const urgentHtml = urgentSOPs.length > 0 ? `
+    <div style="background:var(--rel);border:1px solid rgba(192,57,43,.2);border-radius:8px;padding:10px 14px;margin-bottom:10px;">
+      <div style="font-size:12px;font-weight:700;color:var(--re);margin-bottom:6px;">🔴 ${urgentSOPs.length} proceso${urgentSOPs.length>1?'s':''} urgente${urgentSOPs.length>1?'s':''}</div>
+      ${urgentSOPs.map(p => `<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;">
+        <span style="font-size:13px;">${p.emoji} ${escHtml(p.name)}</span>
+        <button class="btn btn-danger btn-sm" onclick="startProc(${p.id})" style="font-size:11px">Ejecutar →</button>
+      </div>`).join('')}
+    </div>` : '';
+
+  if (all.length === 0 && urgentSOPs.length === 0) {
+    container.innerHTML = urgentHtml + `<div style="text-align:center;padding:20px;color:var(--ink3);font-size:13px;">Ejecuta un proceso desde <strong>Procesos SOP</strong> para verlo aquí.</div>`;
+    return;
+  }
+
+  container.innerHTML = urgentHtml + rows.join('') || `<div style="text-align:center;padding:20px;color:var(--ink3);font-size:13px;">No hay actividad registrada.</div>`;
+}
+
+// Review a completed process (show it read-only)
+function reviewProc(id) {
+  const session = getActiveSession(id);
+  curProc = PROCS.find(p => p.id === id);
+  if (!curProc) return;
+  if (session) {
+    curStep = curProc.stepData.length - 1; // show last step
+    stepChecks = session.stepChecks || curProc.stepData.map(s => new Array(s.checks.length).fill(true));
+  }
+  document.getElementById('exec-title').textContent = curProc.emoji + ' ' + curProc.name;
+  document.getElementById('exec-sub').textContent = curProc.desc;
+  document.getElementById('exec-meta').innerHTML = `<span style="font-size:12px;color:var(--ink2)">👤 ${curProc.resp}</span><span style="font-size:12px;color:var(--gr);font-weight:600;">✓ Completado</span>`;
+  document.getElementById('exec-resp-body').innerHTML = `<div style="font-size:13px;font-weight:500">${curProc.resp}</div><div style="font-size:11px;color:var(--gr);margin-top:3px;">✓ Proceso completado</div>`;
+  document.getElementById('exec-ai-msgs').innerHTML = `<div class="mai bot">Revisando "<strong>${curProc.name}</strong>" — completado. ¿Tienes alguna duda? 👋</div>`;
+  renderStepList();
+  updateRing();
+  goTo('execution', null);
+}
+
+// ══ REGISTRY ══
+function renderReg() {
+  const sessionRows = Object.values(SESSIONS).map(s => ({
+    procId: s.procId,
+    proc: s.procEmoji + ' ' + s.procName,
+    resp: '—',
+    ctx: '—',
+    date: formatSessionTime(s.updatedAt),
+    status: s.status,
+    pct: s.pct,
+    clickable: true
+  }));
+  const staticData = [
+    {procId:null, proc:'🔑 Check-in de Inquilino', resp:'Tatiana', ctx:'C/Colón 12, 3º', date:'Ayer 09:30', status:'done', pct:100, clickable:false},
+    {procId:null, proc:'🚪 Check-out de Inquilino', resp:'Yesica', ctx:'Avda. Aragón 5', date:'Ayer 11:00', status:'done', pct:100, clickable:false},
+    {procId:null, proc:'🧹 Coordinación Limpiezas', resp:'Tatiana', ctx:'Planificación semanal', date:'Ayer 14:00', status:'done', pct:100, clickable:false},
+  ];
+  const all = [...sessionRows, ...staticData];
+
+  document.getElementById('reg-body').innerHTML = all.map(r => `
+    <tr style="${r.clickable ? 'cursor:pointer;' : ''}" ${r.clickable && r.status === 'prog' ? `onclick="startProc(${r.procId})"` : r.clickable && r.status === 'done' ? `onclick="reviewProc(${r.procId})"` : ''} title="${r.clickable ? (r.status === 'prog' ? 'Clic para continuar este proceso' : 'Clic para revisar este proceso') : ''}">
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <strong>${r.proc}</strong>
+          ${r.clickable && r.status === 'prog' ? `<span style="font-size:10px;background:var(--bll);color:var(--bl);padding:2px 6px;border-radius:10px;font-weight:700;">● EN CURSO</span>` : ''}
+        </div>
+      </td>
+      <td>${r.resp}</td>
+      <td style="color:var(--ink2);font-size:12px">${r.ctx}</td>
+      <td style="font-family:var(--mono);font-size:12px">${r.date}</td>
+      <td><span class="pill pill-${r.status}">${r.status === 'done' ? '✓ Completado' : r.status === 'prog' ? '● En curso' : '○ Pendiente'}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="prog-bar" style="width:60px;height:4px"><div class="prog-fill ${r.status === 'done' ? 'g' : r.status === 'prog' ? 'b' : 'o'}" style="width:${r.pct}%"></div></div>
+          <span style="font-size:11px;color:var(--ink3)">${r.pct}%</span>
+          ${r.clickable ? `<button class="btn btn-ghost btn-sm" style="padding:3px 8px;font-size:11px" onclick="event.stopPropagation();${r.status === 'prog' ? `startProc(${r.procId})` : `reviewProc(${r.procId})`}">${r.status === 'prog' ? 'Continuar' : 'Ver'}</button>` : ''}
+        </div>
+      </td>
+    </tr>`).join('');
+
+  // highlight hovered rows
+  document.querySelectorAll('#reg-body tr[style*="cursor:pointer"]').forEach(tr => {
+    tr.addEventListener('mouseenter', () => tr.style.background = 'var(--surface2)');
+    tr.addEventListener('mouseleave', () => tr.style.background = '');
+  });
+}
+
+// ══ UTILS ══
+function escHtml(t) {
+  if (!t) return '';
+  return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// INIT
+URGENCY = loadUrgency();
+renderProcs();
+renderReg();
+renderDashboardSessions();
+</script>
+</body>
+</html>
